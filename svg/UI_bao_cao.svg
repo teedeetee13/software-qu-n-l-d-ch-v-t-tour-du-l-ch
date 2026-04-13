@@ -1,0 +1,144 @@
+<svg width="1280" height="950" viewBox="0 0 1280 950" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+    <!-- Nền chính -->
+    <rect width="100%" height="100%" fill="#f0f2f5"/>
+
+    <!-- ==================== THANH ĐIỀU HƯỚNG (SIDEBAR) ==================== -->
+    <g id="sidebar">
+        <rect x="0" y="0" width="240" height="950" fill="#2c3e50"/>
+        
+        <!-- Logo/Tên ứng dụng -->
+        <text x="120" y="40" font-size="24" font-weight="bold" fill="#ecf0f1" text-anchor="middle">TourAdmin</text>
+        <line x1="20" y1="65" x2="220" y2="65" stroke="#34495e"/>
+
+        <!-- Menu Items -->
+        <g id="menu-item-dashboard">
+            <rect x="0" y="80" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="110" font-size="16" fill="#bdc3c7">Dashboard</text>
+        </g>
+        <g id="menu-item-tours">
+            <rect x="0" y="130" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="160" font-size="16" fill="#bdc3c7">Quản lý Tour</text>
+        </g>
+        <g id="menu-item-bookings">
+            <rect x="0" y="180" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="210" font-size="16" fill="#bdc3c7">Quản lý Đặt chỗ</text>
+        </g>
+        <g id="menu-item-customers">
+            <rect x="0" y="230" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="260" font-size="16" fill="#bdc3c7">Khách hàng</text>
+        </g>
+        <g id="menu-item-reports-active">
+            <rect x="0" y="280" width="240" height="50" fill="#3498db"/>
+            <rect x="0" y="280" width="5" height="50" fill="#ecf0f1"/>
+            <text x="40" y="310" font-size="16" fill="#ffffff" font-weight="bold">Báo cáo</text>
+        </g>
+        
+        <!-- Settings at bottom -->
+        <g id="menu-item-settings">
+            <rect x="0" y="880" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="910" font-size="16" fill="#bdc3c7">Cài đặt</text>
+        </g>
+    </g>
+
+    <!-- ==================== PHẦN HEADER VÀ NỘI DUNG CHÍNH ==================== -->
+    <g id="main-content">
+        <!-- Header -->
+        <rect x="240" y="0" width="1040" height="60" fill="#ffffff"/>
+        <line x1="240" y1="60" x2="1280" y2="60" stroke="#e0e0e0"/>
+        
+        <!-- Thanh tìm kiếm -->
+        <rect x="270" y="15" width="300" height="30" rx="15" fill="#f0f2f5" stroke="#e0e0e0"/>
+        <text x="285" y="35" font-size="14" fill="#95a5a6">Tìm kiếm...</text>
+        
+        <!-- Thông tin người dùng -->
+        <circle cx="1200" cy="30" r="18" fill="#bdc3c7"/>
+        <text x="1230" y="35" font-size="14" fill="#2c3e50">Admin</text>
+
+        <!-- Nội dung chính: Báo cáo -->
+        <g id="page-content" transform="translate(270, 80)">
+            <!-- Tiêu đề -->
+            <text x="0" y="25" font-size="28" font-weight="600" fill="#2c3e50">Báo cáo &amp; Thống kê</text>
+            
+            <!-- Report Filters/Options -->
+            <g id="report-filters" transform="translate(0, 70)">
+                <rect x="0" y="0" width="1010" height="80" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                
+                <!-- Report Type Dropdown -->
+                <text x="20" y="30" font-size="14" font-weight="600" fill="#34495e">Loại báo cáo</text>
+                <rect x="20" y="40" width="200" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                <text x="35" y="60" font-size="14" fill="#2c3e50">Doanh thu theo tháng</text>
+                <path d="M7 10l5 5 5-5z" fill="#757575" transform="translate(190, 45) scale(0.8)"/>
+
+                <!-- Date Range Picker -->
+                <text x="240" y="30" font-size="14" font-weight="600" fill="#34495e">Khoảng thời gian</text>
+                <rect x="240" y="40" width="250" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                <text x="255" y="60" font-size="14" fill="#7f8c8d">01/01/2023 - 31/12/2023</text>
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="#757575" transform="translate(460, 43) scale(0.7)"/>
+
+                <!-- Generate Report Button -->
+                <rect x="510" y="40" width="150" height="30" rx="5" fill="#3498db"/>
+                <text x="585" y="60" font-size="14" fill="#ffffff" text-anchor="middle">Tạo báo cáo</text>
+            </g>
+
+            <!-- Report Display Area -->
+            <g id="report-display" transform="translate(0, 170)">
+                <rect x="0" y="0" width="1010" height="650" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                
+                <text x="20" y="30" font-size="18" font-weight="bold" fill="#2c3e50">Báo cáo Doanh thu theo tháng (2023)</text>
+
+                <!-- Placeholder for Chart (e.g., Line Chart for Revenue) -->
+                <g id="revenue-chart" transform="translate(20, 60)">
+                    <rect x="0" y="0" width="970" height="300" fill="#f8f9fa" stroke="#e0e0e0"/>
+                    <!-- Example Line Chart Data Points -->
+                    <polyline points="50,250 120,200 190,220 260,180 330,150 400,170 470,130 540,100 610,120 680,90 750,70 820,50"
+                              fill="none" stroke="#3498db" stroke-width="3"/>
+                    <!-- X-axis labels -->
+                    <text x="50" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T1</text>
+                    <text x="120" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T2</text>
+                    <text x="190" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T3</text>
+                    <text x="260" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T4</text>
+                    <text x="330" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T5</text>
+                    <text x="400" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T6</text>
+                    <text x="470" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T7</text>
+                    <text x="540" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T8</text>
+                    <text x="610" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T9</text>
+                    <text x="680" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T10</text>
+                    <text x="750" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T11</text>
+                    <text x="820" y="270" font-size="12" fill="#7f8c8d" text-anchor="middle">T12</text>
+                    <!-- Y-axis labels -->
+                    <text x="20" y="250" font-size="12" fill="#7f8c8d">0</text>
+                    <text x="20" y="150" font-size="12" fill="#7f8c8d">50M</text>
+                    <text x="20" y="50" font-size="12" fill="#7f8c8d">100M</text>
+                </g>
+
+                <!-- Summary Table -->
+                <g id="summary-table" transform="translate(20, 390)">
+                    <text x="0" y="20" font-size="16" font-weight="bold" fill="#2c3e50">Bảng tổng hợp</text>
+                    <rect x="0" y="40" width="970" height="200" rx="5" fill="#f8f9fa" stroke="#e0e0e0"/>
+                    
+                    <!-- Table Header -->
+                    <rect x="0" y="40" width="970" height="40" fill="#e0e0e0"/>
+                    <text x="20" y="65" font-size="14" font-weight="bold" fill="#34495e">Tháng</text>
+                    <text x="150" y="65" font-size="14" font-weight="bold" fill="#34495e">Doanh thu</text>
+                    <text x="350" y="65" font-size="14" font-weight="bold" fill="#34495e">Số Booking</text>
+                    <text x="550" y="65" font-size="14" font-weight="bold" fill="#34495e">Tour phổ biến</text>
+
+                    <!-- Table Rows -->
+                    <text x="20" y="105" font-size="14" fill="#2c3e50">Tháng 1</text>
+                    <text x="150" y="105" font-size="14" fill="#2c3e50">80,000,000 VNĐ</text>
+                    <text x="350" y="105" font-size="14" fill="#2c3e50">50</text>
+                    <text x="550" y="105" font-size="14" fill="#2c3e50">Vịnh Hạ Long</text>
+
+                    <text x="20" y="135" font-size="14" fill="#2c3e50">Tháng 2</text>
+                    <text x="150" y="135" font-size="14" fill="#2c3e50">95,000,000 VNĐ</text>
+                    <text x="350" y="135" font-size="14" fill="#2c3e50">65</text>
+                    <text x="550" y="135" font-size="14" fill="#2c3e50">Miền Trung</text>
+
+                    <text x="20" y="165" font-size="14" fill="#2c3e50">Tổng cộng</text>
+                    <text x="150" y="165" font-size="14" font-weight="bold" fill="#2c3e50">1,200,000,000 VNĐ</text>
+                    <text x="350" y="165" font-size="14" font-weight="bold" fill="#2c3e50">850</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

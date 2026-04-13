@@ -1,0 +1,139 @@
+<svg width="1280" height="950" viewBox="0 0 1280 950" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+    <!-- Nền chính -->
+    <rect width="100%" height="100%" fill="#f0f2f5"/>
+
+    <!-- ==================== THANH ĐIỀU HƯỚNG (SIDEBAR) ==================== -->
+    <g id="sidebar">
+        <rect x="0" y="0" width="240" height="950" fill="#2c3e50"/>
+        
+        <!-- Logo/Tên ứng dụng -->
+        <text x="120" y="40" font-size="24" font-weight="bold" fill="#ecf0f1" text-anchor="middle">TourAdmin</text>
+        <line x1="20" y1="65" x2="220" y2="65" stroke="#34495e"/>
+
+        <!-- Menu Items -->
+        <g id="menu-item-dashboard">
+            <rect x="0" y="80" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="110" font-size="16" fill="#bdc3c7">Dashboard</text>
+        </g>
+        <g id="menu-item-tours-active">
+            <rect x="0" y="130" width="240" height="50" fill="#3498db"/>
+            <rect x="0" y="130" width="5" height="50" fill="#ecf0f1"/>
+            <text x="40" y="160" font-size="16" fill="#ffffff" font-weight="bold">Quản lý Tour</text>
+        </g>
+        <g id="menu-item-bookings">
+            <rect x="0" y="180" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="210" font-size="16" fill="#bdc3c7">Quản lý Đặt chỗ</text>
+        </g>
+        <g id="menu-item-customers">
+            <rect x="0" y="230" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="260" font-size="16" fill="#bdc3c7">Khách hàng</text>
+        </g>
+        <g id="menu-item-reports">
+            <rect x="0" y="280" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="310" font-size="16" fill="#bdc3c7">Báo cáo</text>
+        </g>
+        
+        <!-- Settings at bottom -->
+        <g id="menu-item-settings">
+            <rect x="0" y="880" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="910" font-size="16" fill="#bdc3c7">Cài đặt</text>
+        </g>
+    </g>
+
+    <!-- ==================== PHẦN HEADER VÀ NỘI DUNG CHÍNH ==================== -->
+    <g id="main-content">
+        <!-- Header -->
+        <rect x="240" y="0" width="1040" height="60" fill="#ffffff"/>
+        <line x1="240" y1="60" x2="1280" y2="60" stroke="#e0e0e0"/>
+        
+        <!-- Thanh tìm kiếm -->
+        <rect x="270" y="15" width="300" height="30" rx="15" fill="#f0f2f5" stroke="#e0e0e0"/>
+        <text x="285" y="35" font-size="14" fill="#95a5a6">Tìm kiếm tour, điểm đến...</text>
+        
+        <!-- Thông tin người dùng -->
+        <circle cx="1200" cy="30" r="18" fill="#bdc3c7"/>
+        <text x="1230" y="35" font-size="14" fill="#2c3e50">Admin</text>
+
+        <!-- Nội dung chính: Form Thêm/Sửa Tour -->
+        <g id="page-content" transform="translate(270, 80)">
+            <!-- Tiêu đề -->
+            <text x="0" y="25" font-size="28" font-weight="600" fill="#2c3e50">Thêm Tour Mới</text>
+            
+            <!-- Form Container -->
+            <rect x="0" y="60" width="1010" height="780" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+
+            <g id="tour-form" transform="translate(30, 90)">
+                <!-- Cột trái -->
+                <g id="form-left-column">
+                    <!-- Tên Tour -->
+                    <text x="0" y="20" font-size="14" font-weight="600" fill="#34495e">Tên Tour</text>
+                    <rect x="0" y="30" width="450" height="40" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="15" y="55" font-size="14" fill="#7f8c8d">VD: Khám phá Vịnh Hạ Long 3N2Đ</text>
+
+                    <!-- Điểm đến -->
+                    <text x="0" y="100" font-size="14" font-weight="600" fill="#34495e">Điểm đến</text>
+                    <rect x="0" y="110" width="450" height="40" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="15" y="135" font-size="14" fill="#7f8c8d">VD: Quảng Ninh</text>
+
+                    <!-- Mô tả ngắn -->
+                    <text x="0" y="180" font-size="14" font-weight="600" fill="#34495e">Mô tả ngắn</text>
+                    <rect x="0" y="190" width="450" height="100" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="15" y="215" font-size="14" fill="#7f8c8d">Mô tả tổng quan về chuyến đi...</text>
+
+                    <!-- Lịch trình chi tiết -->
+                    <text x="0" y="320" font-size="14" font-weight="600" fill="#34495e">Lịch trình chi tiết</text>
+                    <rect x="0" y="330" width="450" height="200" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="15" y="355" font-size="14" fill="#7f8c8d">Ngày 1: ...&#x0a;Ngày 2: ...</text>
+
+                </g>
+
+                <!-- Cột phải -->
+                <g id="form-right-column" transform="translate(500, 0)">
+                    <!-- Ngày khởi hành -->
+                    <text x="0" y="20" font-size="14" font-weight="600" fill="#34495e">Ngày khởi hành</text>
+                    <rect x="0" y="30" width="200" height="40" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="15" y="55" font-size="14" fill="#2c3e50">20/12/2023</text>
+                    <!-- Calendar Icon -->
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="#757575" transform="translate(170, 38) scale(0.8)"/>
+
+                    <!-- Số ngày -->
+                    <text x="250" y="20" font-size="14" font-weight="600" fill="#34495e">Số ngày</text>
+                    <rect x="250" y="30" width="200" height="40" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="265" y="55" font-size="14" fill="#2c3e50">3</text>
+
+                    <!-- Giá -->
+                    <text x="0" y="100" font-size="14" font-weight="600" fill="#34495e">Giá (VNĐ)</text>
+                    <rect x="0" y="110" width="450" height="40" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="15" y="135" font-size="14" fill="#7f8c8d">VD: 3500000</text>
+
+                    <!-- Trạng thái -->
+                    <text x="0" y="180" font-size="14" font-weight="600" fill="#34495e">Trạng thái</text>
+                    <rect x="0" y="190" width="450" height="40" rx="5" fill="#ffffff" stroke="#bdc3c7"/>
+                    <text x="15" y="215" font-size="14" fill="#2c3e50">Hoạt động</text>
+                    <!-- Dropdown arrow -->
+                    <path d="M7 10l5 5 5-5z" fill="#757575" transform="translate(420, 198)"/>
+
+                    <!-- Ảnh đại diện -->
+                    <text x="0" y="260" font-size="14" font-weight="600" fill="#34495e">Ảnh đại diện</text>
+                    <rect x="0" y="270" width="450" height="150" rx="5" fill="#f8f9fa" stroke="#bdc3c7" stroke-dasharray="5,5"/>
+                    <g text-anchor="middle">
+                        <!-- Upload Icon -->
+                        <path d="M9 16h6v-6h4l-8-8-8 8h4v6zm-4 2h14v2H5v-2z" fill="#95a5a6" transform="translate(215, 290)"/>
+                        <text x="225" y="340" font-size="14" fill="#95a5a6">Kéo và thả hoặc nhấn để tải ảnh lên</text>
+                        <text x="225" y="360" font-size="12" fill="#bdc3c7">PNG, JPG, GIF tối đa 800KB</text>
+                    </g>
+                </g>
+
+                <!-- Nút hành động -->
+                <g id="form-actions" transform="translate(0, 650)">
+                    <line x1="0" y1="0" x2="950" y2="0" stroke="#e0e0e0"/>
+                    <rect x="820" y="20" width="130" height="40" rx="5" fill="#3498db"/>
+                    <text x="885" y="45" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">Lưu lại</text>
+
+                    <rect x="670" y="20" width="130" height="40" rx="5" fill="#ecf0f1" stroke="#bdc3c7"/>
+                    <text x="735" y="45" font-size="14" fill="#7f8c8d" text-anchor="middle" font-weight="bold">Hủy</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

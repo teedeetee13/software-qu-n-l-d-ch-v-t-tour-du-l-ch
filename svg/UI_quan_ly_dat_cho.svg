@@ -1,0 +1,187 @@
+<svg width="1280" height="950" viewBox="0 0 1280 950" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+    <!-- Nền chính -->
+    <rect width="100%" height="100%" fill="#f0f2f5"/>
+
+    <!-- ==================== THANH ĐIỀU HƯỚNG (SIDEBAR) ==================== -->
+    <g id="sidebar">
+        <rect x="0" y="0" width="240" height="950" fill="#2c3e50"/>
+        
+        <!-- Logo/Tên ứng dụng -->
+        <text x="120" y="40" font-size="24" font-weight="bold" fill="#ecf0f1" text-anchor="middle">TourAdmin</text>
+        <line x1="20" y1="65" x2="220" y2="65" stroke="#34495e"/>
+
+        <!-- Menu Items -->
+        <g id="menu-item-dashboard">
+            <rect x="0" y="80" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="110" font-size="16" fill="#bdc3c7">Dashboard</text>
+        </g>
+        <g id="menu-item-tours">
+            <rect x="0" y="130" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="160" font-size="16" fill="#bdc3c7">Quản lý Tour</text>
+        </g>
+        <g id="menu-item-bookings-active">
+            <rect x="0" y="180" width="240" height="50" fill="#3498db"/>
+            <rect x="0" y="180" width="5" height="50" fill="#ecf0f1"/>
+            <text x="40" y="210" font-size="16" fill="#ffffff" font-weight="bold">Quản lý Đặt chỗ</text>
+        </g>
+        <g id="menu-item-customers">
+            <rect x="0" y="230" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="260" font-size="16" fill="#bdc3c7">Khách hàng</text>
+        </g>
+        <g id="menu-item-reports">
+            <rect x="0" y="280" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="310" font-size="16" fill="#bdc3c7">Báo cáo</text>
+        </g>
+        
+        <!-- Settings at bottom -->
+        <g id="menu-item-settings">
+            <rect x="0" y="880" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="910" font-size="16" fill="#bdc3c7">Cài đặt</text>
+        </g>
+    </g>
+
+    <!-- ==================== PHẦN HEADER VÀ NỘI DUNG CHÍNH ==================== -->
+    <g id="main-content">
+        <!-- Header -->
+        <rect x="240" y="0" width="1040" height="60" fill="#ffffff"/>
+        <line x1="240" y1="60" x2="1280" y2="60" stroke="#e0e0e0"/>
+        
+        <!-- Thanh tìm kiếm -->
+        <rect x="270" y="15" width="300" height="30" rx="15" fill="#f0f2f5" stroke="#e0e0e0"/>
+        <text x="285" y="35" font-size="14" fill="#95a5a6">Tìm kiếm...</text>
+        
+        <!-- Thông tin người dùng -->
+        <circle cx="1200" cy="30" r="18" fill="#bdc3c7"/>
+        <text x="1230" y="35" font-size="14" fill="#2c3e50">Admin</text>
+
+        <!-- Nội dung chính: Danh sách Đặt chỗ -->
+        <g id="page-content" transform="translate(270, 80)">
+            <!-- Tiêu đề và nút hành động -->
+            <text x="0" y="25" font-size="28" font-weight="600" fill="#2c3e50">Danh sách Đặt chỗ</text>
+            <rect x="850" y="5" width="160" height="40" rx="5" fill="#3498db"/>
+            <text x="930" y="30" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">+ Thêm Đặt chỗ Mới</text>
+
+            <!-- Filter/Search Bar -->
+            <g id="filter-bar" transform="translate(0, 70)">
+                <rect x="0" y="0" width="1010" height="60" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                
+                <!-- Search Input -->
+                <rect x="20" y="15" width="300" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                <text x="35" y="35" font-size="14" fill="#95a5a6">Tìm kiếm theo mã, khách hàng...</text>
+
+                <!-- Status Dropdown -->
+                <rect x="340" y="15" width="150" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                <text x="355" y="35" font-size="14" fill="#7f8c8d">Trạng thái</text>
+                <path d="M7 10l5 5 5-5z" fill="#757575" transform="translate(460, 20) scale(0.8)"/>
+
+                <!-- Date Range Picker -->
+                <rect x="510" y="15" width="200" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                <text x="525" y="35" font-size="14" fill="#7f8c8d">Ngày đặt</text>
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="#757575" transform="translate(680, 18) scale(0.7)"/>
+
+                <!-- Apply Filter Button -->
+                <rect x="730" y="15" width="100" height="30" rx="5" fill="#2ecc71"/>
+                <text x="780" y="35" font-size="14" fill="#ffffff" text-anchor="middle">Lọc</text>
+            </g>
+
+            <!-- Bảng dữ liệu Đặt chỗ -->
+            <g id="data-table" transform="translate(0, 150)">
+                <!-- Nền bảng -->
+                <rect x="0" y="0" width="1010" height="600" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                
+                <!-- Tiêu đề bảng -->
+                <rect x="0" y="0" width="1010" height="50" fill="#f8f9fa" rx="8" ry="0"/>
+                <text x="30" y="32" font-size="14" font-weight="bold" fill="#34495e">Mã Đặt chỗ</text>
+                <text x="150" y="32" font-size="14" font-weight="bold" fill="#34495e">Khách hàng</text>
+                <text x="300" y="32" font-size="14" font-weight="bold" fill="#34495e">Tour</text>
+                <text x="500" y="32" font-size="14" font-weight="bold" fill="#34495e">Ngày đặt</text>
+                <text x="620" y="32" font-size="14" font-weight="bold" fill="#34495e">Số khách</text>
+                <text x="700" y="32" font-size="14" font-weight="bold" fill="#34495e">Tổng tiền</text>
+                <text x="820" y="32" font-size="14" font-weight="bold" fill="#34495e">Trạng thái</text>
+                <text x="930" y="32" font-size="14" font-weight="bold" fill="#34495e">Hành động</text>
+                <line x1="0" y1="50" x2="1010" y2="50" stroke="#e0e0e0"/>
+
+                <!-- Dòng dữ liệu 1 -->
+                <g id="booking-row-1" transform="translate(0, 50)">
+                    <text x="30" y="32" font-size="14" fill="#2c3e50">BK001</text>
+                    <text x="150" y="32" font-size="14" fill="#2c3e50">Nguyễn Văn A</text>
+                    <text x="300" y="32" font-size="14" fill="#2c3e50">Vịnh Hạ Long 3N2Đ</text>
+                    <text x="500" y="32" font-size="14" fill="#2c3e50">10/12/2023</text>
+                    <text x="620" y="32" font-size="14" fill="#2c3e50">2</text>
+                    <text x="700" y="32" font-size="14" fill="#2c3e50">7,000,000đ</text>
+                    
+                    <!-- Trạng thái -->
+                    <rect x="820" y="18" width="100" height="24" rx="12" fill="#e8f5e9"/>
+                    <text x="870" y="33" font-size="12" fill="#2e7d32" text-anchor="middle">Đã xác nhận</text>
+                    
+                    <!-- Hành động (Icons) -->
+                    <g id="actions-1" transform="translate(930, 18)">
+                        <!-- View Icon -->
+                        <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" fill="#757575" transform="scale(0.8)"/>
+                        <!-- Edit Icon -->
+                        <path d="M17.25,2.81L19.19,4.75L7.44,16.5H5.5V14.56L17.25,2.81M17.25,0C17.25,0 17.06,0 16.9,0.06L14.5,2.45L19.55,7.5L21.94,5.1C22.33,4.71 22.33,4.08 21.94,3.69L18.31,0.06C18.15,0 17.96,0 17.77,0H17.25Z M3,20H21V22H3V20Z" fill="#757575" transform="translate(25, 0) scale(0.8)"/>
+                    </g>
+                    <line x1="15" y1="50" x2="995" y2="50" stroke="#e0e0e0"/>
+                </g>
+
+                <!-- Dòng dữ liệu 2 -->
+                <g id="booking-row-2" transform="translate(0, 100)">
+                    <rect x="0" y="0" width="1010" height="50" fill="#f8f9fa"/>
+                    <text x="30" y="32" font-size="14" fill="#2c3e50">BK002</text>
+                    <text x="150" y="32" font-size="14" fill="#2c3e50">Trần Thị B</text>
+                    <text x="300" y="32" font-size="14" fill="#2c3e50">Hành trình Di sản Miền Trung</text>
+                    <text x="500" y="32" font-size="14" fill="#2c3e50">05/12/2023</text>
+                    <text x="620" y="32" font-size="14" fill="#2c3e50">4</text>
+                    <text x="700" y="32" font-size="14" fill="#2c3e50">20,800,000đ</text>
+                    
+                    <!-- Trạng thái -->
+                    <rect x="820" y="18" width="100" height="24" rx="12" fill="#fff3e0"/>
+                    <text x="870" y="33" font-size="12" fill="#e65100" text-anchor="middle">Chờ xử lý</text>
+                    
+                    <!-- Hành động (Icons) -->
+                    <g id="actions-2" transform="translate(930, 18)">
+                        <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" fill="#757575" transform="scale(0.8)"/>
+                        <path d="M17.25,2.81L19.19,4.75L7.44,16.5H5.5V14.56L17.25,2.81M17.25,0C17.25,0 17.06,0 16.9,0.06L14.5,2.45L19.55,7.5L21.94,5.1C22.33,4.71 22.33,4.08 21.94,3.69L18.31,0.06C18.15,0 17.96,0 17.77,0H17.25Z M3,20H21V22H3V20Z" fill="#757575" transform="translate(25, 0) scale(0.8)"/>
+                    </g>
+                    <line x1="15" y1="50" x2="995" y2="50" stroke="#e0e0e0"/>
+                </g>
+
+                <!-- Dòng dữ liệu 3 -->
+                <g id="booking-row-3" transform="translate(0, 150)">
+                    <text x="30" y="32" font-size="14" fill="#2c3e50">BK003</text>
+                    <text x="150" y="32" font-size="14" fill="#2c3e50">Lê Văn C</text>
+                    <text x="300" y="32" font-size="14" fill="#2c3e50">Chinh phục nóc nhà Đông Dương</text>
+                    <text x="500" y="32" font-size="14" fill="#2c3e50">01/11/2023</text>
+                    <text x="620" y="32" font-size="14" fill="#2c3e50">1</text>
+                    <text x="700" y="32" font-size="14" fill="#2c3e50">2,800,000đ</text>
+                    
+                    <!-- Trạng thái -->
+                    <rect x="820" y="18" width="100" height="24" rx="12" fill="#ffebee"/>
+                    <text x="870" y="33" font-size="12" fill="#c62828" text-anchor="middle">Đã hủy</text>
+                    
+                    <!-- Hành động (Icons) -->
+                    <g id="actions-3" transform="translate(930, 18)">
+                        <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" fill="#757575" transform="scale(0.8)"/>
+                        <path d="M17.25,2.81L19.19,4.75L7.44,16.5H5.5V14.56L17.25,2.81M17.25,0C17.25,0 17.06,0 16.9,0.06L14.5,2.45L19.55,7.5L21.94,5.1C22.33,4.71 22.33,4.08 21.94,3.69L18.31,0.06C18.15,0 17.96,0 17.77,0H17.25Z M3,20H21V22H3V20Z" fill="#757575" transform="translate(25, 0) scale(0.8)"/>
+                    </g>
+                    <line x1="15" y1="50" x2="995" y2="50" stroke="#e0e0e0"/>
+                </g>
+                
+                <!-- Pagination -->
+                <g id="pagination" transform="translate(0, 550)">
+                    <text x="30" y="25" font-size="14" fill="#7f8c8d">Hiển thị 1-10 trên 50 kết quả</text>
+                    <rect x="800" y="10" width="30" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                    <text x="815" y="30" font-size="14" fill="#7f8c8d" text-anchor="middle">&lt;</text>
+                    <rect x="840" y="10" width="30" height="30" rx="5" fill="#3498db"/>
+                    <text x="855" y="30" font-size="14" fill="#ffffff" text-anchor="middle">1</text>
+                    <rect x="880" y="10" width="30" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                    <text x="895" y="30" font-size="14" fill="#7f8c8d" text-anchor="middle">2</text>
+                    <rect x="920" y="10" width="30" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                    <text x="935" y="30" font-size="14" fill="#7f8c8d" text-anchor="middle">3</text>
+                    <rect x="960" y="10" width="30" height="30" rx="5" fill="#f0f2f5" stroke="#e0e0e0"/>
+                    <text x="975" y="30" font-size="14" fill="#7f8c8d" text-anchor="middle">&gt;</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

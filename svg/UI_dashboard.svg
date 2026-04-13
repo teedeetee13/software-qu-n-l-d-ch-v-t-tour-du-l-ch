@@ -1,0 +1,150 @@
+<svg width="1280" height="950" viewBox="0 0 1280 950" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+    <!-- Nền chính -->
+    <rect width="100%" height="100%" fill="#f0f2f5"/>
+
+    <!-- ==================== THANH ĐIỀU HƯỚNG (SIDEBAR) ==================== -->
+    <g id="sidebar">
+        <rect x="0" y="0" width="240" height="950" fill="#2c3e50"/>
+        
+        <!-- Logo/Tên ứng dụng -->
+        <text x="120" y="40" font-size="24" font-weight="bold" fill="#ecf0f1" text-anchor="middle">TourAdmin</text>
+        <line x1="20" y1="65" x2="220" y2="65" stroke="#34495e"/>
+
+        <!-- Menu Items -->
+        <g id="menu-item-dashboard-active">
+            <rect x="0" y="80" width="240" height="50" fill="#3498db"/>
+            <rect x="0" y="80" width="5" height="50" fill="#ecf0f1"/>
+            <text x="40" y="110" font-size="16" fill="#ffffff" font-weight="bold">Dashboard</text>
+        </g>
+        <g id="menu-item-tours">
+            <rect x="0" y="130" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="160" font-size="16" fill="#bdc3c7">Quản lý Tour</text>
+        </g>
+        <g id="menu-item-bookings">
+            <rect x="0" y="180" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="210" font-size="16" fill="#bdc3c7">Quản lý Đặt chỗ</text>
+        </g>
+        <g id="menu-item-customers">
+            <rect x="0" y="230" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="260" font-size="16" fill="#bdc3c7">Khách hàng</text>
+        </g>
+        <g id="menu-item-reports">
+            <rect x="0" y="280" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="310" font-size="16" fill="#bdc3c7">Báo cáo</text>
+        </g>
+        
+        <!-- Settings at bottom -->
+        <g id="menu-item-settings">
+            <rect x="0" y="880" width="240" height="50" fill="#2c3e50"/>
+            <text x="40" y="910" font-size="16" fill="#bdc3c7">Cài đặt</text>
+        </g>
+    </g>
+
+    <!-- ==================== PHẦN HEADER VÀ NỘI DUNG CHÍNH ==================== -->
+    <g id="main-content">
+        <!-- Header -->
+        <rect x="240" y="0" width="1040" height="60" fill="#ffffff"/>
+        <line x1="240" y1="60" x2="1280" y2="60" stroke="#e0e0e0"/>
+        
+        <!-- Thanh tìm kiếm -->
+        <rect x="270" y="15" width="300" height="30" rx="15" fill="#f0f2f5" stroke="#e0e0e0"/>
+        <text x="285" y="35" font-size="14" fill="#95a5a6">Tìm kiếm...</text>
+        
+        <!-- Thông tin người dùng -->
+        <circle cx="1200" cy="30" r="18" fill="#bdc3c7"/>
+        <text x="1230" y="35" font-size="14" fill="#2c3e50">Admin</text>
+
+        <!-- Nội dung chính: Dashboard -->
+        <g id="page-content" transform="translate(270, 80)">
+            <!-- Tiêu đề -->
+            <text x="0" y="25" font-size="28" font-weight="600" fill="#2c3e50">Dashboard</text>
+            
+            <!-- Metric Cards -->
+            <g id="metric-cards" transform="translate(0, 60)">
+                <!-- Card 1: Total Tours -->
+                <rect x="0" y="0" width="230" height="120" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                <text x="20" y="40" font-size="16" fill="#7f8c8d">Tổng số Tour</text>
+                <text x="20" y="85" font-size="32" font-weight="bold" fill="#2c3e50">125</text>
+                
+                <!-- Card 2: Total Bookings -->
+                <rect x="260" y="0" width="230" height="120" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                <text x="280" y="40" font-size="16" fill="#7f8c8d">Tổng số Đặt chỗ</text>
+                <text x="280" y="85" font-size="32" font-weight="bold" fill="#2c3e50">850</text>
+
+                <!-- Card 3: Total Revenue -->
+                <rect x="520" y="0" width="230" height="120" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                <text x="540" y="40" font-size="16" fill="#7f8c8d">Tổng Doanh thu</text>
+                <text x="540" y="85" font-size="32" font-weight="bold" fill="#2c3e50">1.2 Tỷ VNĐ</text>
+
+                <!-- Card 4: Active Customers -->
+                <rect x="780" y="0" width="230" height="120" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                <text x="800" y="40" font-size="16" fill="#7f8c8d">Khách hàng hoạt động</text>
+                <text x="800" y="85" font-size="32" font-weight="bold" fill="#2c3e50">500</text>
+            </g>
+
+            <!-- Charts Section -->
+            <g id="charts-section" transform="translate(0, 200)">
+                <!-- Chart 1: Revenue by Month -->
+                <rect x="0" y="0" width="490" height="350" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                <text x="20" y="30" font-size="18" font-weight="bold" fill="#2c3e50">Doanh thu theo tháng</text>
+                <!-- Placeholder for Bar Chart -->
+                <rect x="50" y="80" width="40" height="200" fill="#3498db"/>
+                <rect x="110" y="120" width="40" height="160" fill="#3498db"/>
+                <rect x="170" y="100" width="40" height="180" fill="#3498db"/>
+                <rect x="230" y="150" width="40" height="130" fill="#3498db"/>
+                <rect x="290" y="90" width="40" height="190" fill="#3498db"/>
+                <rect x="350" y="130" width="40" height="150" fill="#3498db"/>
+                <rect x="410" y="70" width="40" height="210" fill="#3498db"/>
+                <line x1="40" y1="280" x2="460" y2="280" stroke="#bdc3c7"/>
+                <text x="50" y="300" font-size="12" fill="#7f8c8d" text-anchor="middle">T1</text>
+                <text x="110" y="300" font-size="12" fill="#7f8c8d" text-anchor="middle">T2</text>
+                <text x="170" y="300" font-size="12" fill="#7f8c8d" text-anchor="middle">T3</text>
+                <text x="230" y="300" font-size="12" fill="#7f8c8d" text-anchor="middle">T4</text>
+                <text x="290" y="300" font-size="12" fill="#7f8c8d" text-anchor="middle">T5</text>
+                <text x="350" y="300" font-size="12" fill="#7f8c8d" text-anchor="middle">T6</text>
+                <text x="410" y="300" font-size="12" fill="#7f8c8d" text-anchor="middle">T7</text>
+
+
+                <!-- Chart 2: Bookings by Tour (Pie Chart) -->
+                <rect x="520" y="0" width="490" height="350" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                <text x="540" y="30" font-size="18" font-weight="bold" fill="#2c3e50">Đặt chỗ theo Tour</text>
+                <!-- Pie Chart Slices -->
+                <!-- Center (765, 190), Radius 90 -->
+                <!-- Slice 1 (30%): 0 to 108 degrees -->
+                <path d="M765,190 L765,100 A90,90 0 0,1 850.59,217.81 Z" fill="#3498db"/>
+                <!-- Slice 2 (25%): 108 to 198 degrees -->
+                <path d="M765,190 L850.59,217.81 A90,90 0 0,1 737.19,275.59 Z" fill="#2ecc71"/>
+                <!-- Slice 3 (20%): 198 to 270 degrees -->
+                <path d="M765,190 L737.19,275.59 A90,90 0 0,1 675,190 Z" fill="#e67e22"/>
+                <!-- Slice 4 (25%): 270 to 360 degrees -->
+                <path d="M765,190 L675,190 A90,90 0 0,1 765,100 Z" fill="#9b59b6"/>
+                
+                <!-- Pie Chart Legend -->
+                <g transform="translate(600, 280)">
+                    <rect x="0" y="0" width="10" height="10" fill="#3498db"/>
+                    <text x="15" y="10" font-size="12" fill="#2c3e50">Vịnh Hạ Long (30%)</text>
+                    <rect x="0" y="20" width="10" height="10" fill="#2ecc71"/>
+                    <text x="15" y="30" font-size="12" fill="#2c3e50">Miền Trung (25%)</text>
+                    <rect x="0" y="40" width="10" height="10" fill="#e67e22"/>
+                    <text x="15" y="50" font-size="12" fill="#2c3e50">Sapa (20%)</text>
+                    <rect x="0" y="60" width="10" height="10" fill="#9b59b6"/>
+                    <text x="15" y="70" font-size="12" fill="#2c3e50">Khác (25%)</text>
+                </g>
+            </g>
+
+            <!-- Recent Activities / Upcoming Tours -->
+            <g id="recent-activities" transform="translate(0, 570)">
+                <rect x="0" y="0" width="1010" height="250" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+                <text x="20" y="30" font-size="18" font-weight="bold" fill="#2c3e50">Hoạt động gần đây / Tour sắp khởi hành</text>
+                
+                <!-- List items -->
+                <g transform="translate(20, 60)">
+                    <text x="0" y="0" font-size="14" fill="#2c3e50">• Khách hàng Nguyễn Văn A đã đặt tour Vịnh Hạ Long (20/12/2023)</text>
+                    <text x="0" y="30" font-size="14" fill="#2c3e50">• Tour Miền Trung (15/01/2024) sắp khởi hành (còn 20 ngày)</text>
+                    <text x="0" y="60" font-size="14" fill="#2c3e50">• Khách hàng Trần Thị B đã hủy đặt chỗ tour Sapa</text>
+                    <text x="0" y="90" font-size="14" fill="#2c3e50">• Tour Vịnh Hạ Long (20/12/2023) đã được cập nhật thông tin</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
