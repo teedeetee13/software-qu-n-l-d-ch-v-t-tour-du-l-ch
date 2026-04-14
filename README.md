@@ -19,11 +19,19 @@
 
 ## 3. Sơ đồ Use Case
 ```mermaid
-usecaseDiagram
-    actor "Khách hàng" as User
-    actor "Quản trị viên" as Admin
-    
-    User --> (Tìm kiếm Tour)
-    User --> (Đặt Tour)
-    Admin --> (Quản lý Tour)
-    Admin --> (Duyệt Đơn hàng)
+graph LR
+    %% Định nghĩa các Actor
+    User((Khách hàng))
+    Admin((Quản trị viên))
+
+    %% Định nghĩa các Use Case
+    UC1(Tìm kiếm Tour)
+    UC2(Đặt Tour)
+    UC3(Quản lý Tour)
+    UC4(Duyệt Đơn hàng)
+
+    %% Kết nối
+    User --- UC1
+    User --- UC2
+    Admin --- UC3
+    Admin --- UC4
