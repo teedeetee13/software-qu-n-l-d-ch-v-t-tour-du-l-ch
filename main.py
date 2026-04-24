@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import os
+import signal
 from tkinter import ttk
 import auth_session
 from view.login_view import LoginView
@@ -133,10 +134,13 @@ class MainApp(ctk.CTk):
         if hasattr(self, 'current_content') and self.current_content:
             self.current_content.destroy()
         
-        # Chỉ ngắt mainloop ở đây, KHÔNG gọi lệnh exit bên trong callback của Tkinter
+        # Chỉ ngắt mainloop ở đây, KHÔNG gọi lệnh exit bên trong callback của Tkinter   
         self.quit()
 
 if __name__ == "__main__":
+    # Bỏ qua tín hiệu ngắt (Ctrl+C) từ terminal để tránh văng app khi vô tình thao tác phím
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+
     app = MainApp()
     app.mainloop()
     

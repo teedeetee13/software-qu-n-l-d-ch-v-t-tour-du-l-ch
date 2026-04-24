@@ -2,10 +2,13 @@ import customtkinter as ctk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.animation as animation
+from db_manager import DBManager
+import datetime
 
 class DashboardView(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, corner_radius=0, fg_color="#f0f2f5")
+        self.db = DBManager()
         self.grid_rowconfigure(2, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
@@ -34,9 +37,10 @@ class DashboardView(ctk.CTkFrame):
             ctk.CTkLabel(card, text=title, font=ctk.CTkFont(family="Arial", size=14), text_color="#7f8c8d").pack(anchor="w", padx=20, pady=(15, 5))
             ctk.CTkLabel(card, text=value, font=ctk.CTkFont(family="Arial", size=26, weight="bold"), text_color=color).pack(anchor="w", padx=20)
 
-        create_card(cards_frame, "Tổng Doanh Thu", "1.250.000.000 ₫", "#2ecc71", 0)
-        create_card(cards_frame, "Tour Đang Chạy", "12 Tour", "#3498db", 1)
-        create_card(cards_frame, "Khách Hàng Mới", "340 Khách", "#9b59b6", 2)
+        revenue, bookings, customers, tours = self.db.get_dashboard_stats()
+        create_card(cards_frame, "Tổng Doanh Thu", f"{revenue:,} ₫", "#2ecc71", 0)
+        create_card(cards_frame, "Tour Đang Chạy", f"{tours} Tour", "#3498db", 1)
+        create_card(cards_frame, "Khách Hàng", f"{customers} Khách", "#9b59b6", 2)
 
     def create_charts_section(self):
         charts_container = ctk.CTkFrame(self, fg_color="transparent")
@@ -55,14 +59,24 @@ class DashboardView(ctk.CTkFrame):
         self.fig1.subplots_adjust(left=0.15, right=0.95, top=0.9, bottom=0.15)
         self.ax1.set_facecolor('#ffffff')        
         
-        # Dữ liệu giả lập
-        self.months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6']
-        self.target_values = [150, 230, 180, 320, 280, 450] # Triệu VNĐ
+        # Lấy dữ liệu 6 tháng gần nhất từ DB
+        current_month = datetime.datetime.now().month
+        rev_data = self.db.get_monthly_revenue()
+        
+        self.months = []
+        self.target_values = []
+        for i in range(5, -1, -1):
+            m = current_month - i
+            if m <= 0: m += 12
+            self.months.append(f"T{m}")
+            self.target_values.append(rev_data.get(m, 0) / 1000000) # Triệu VNĐ
+
         self.current_values = [0] * len(self.months)        # Bắt đầu từ 0 để tạo animation
         
         # Vẽ các cột (Ban đầu chiều cao là 0)
         self.bars = self.ax1.bar(self.months, self.current_values, color='#3498db', width=0.55, edgecolor='none', alpha=0.85, zorder=3)
-        self.ax1.set_ylim(0, 500)
+        max_target = max(self.target_values) if self.target_values and max(self.target_values) > 0 else 100
+        self.ax1.set_ylim(0, max_target * 1.2)
         self.ax1.set_ylabel("Triệu VNĐ", color="#7f8c8d", fontsize=10)
         self.ax1.tick_params(colors='#34495e', labelsize=9)
         
@@ -88,10 +102,17 @@ class DashboardView(ctk.CTkFrame):
         self.fig2.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
         self.ax2.set_facecolor('#ffffff')
 
-        pie_labels = ['Vịnh Hạ Long', 'Miền Trung', 'Sapa', 'Khác']
-        pie_sizes = [30, 25, 20, 25]
-        pie_colors = ['#3498db', '#2ecc71', '#e67e22', '#9b59b6']
-        explode = (0.05, 0, 0, 0) # Nhấn mạnh tour đầu tiên
+        tour_ratio = self.db.get_tour_booking_ratio()
+        if tour_ratio:
+            pie_labels = [row[0] for row in tour_ratio]
+            pie_sizes = [row[1] for row in tour_ratio]
+            explode = [0.05 if i == 0 else 0 for i in range(len(pie_sizes))]
+        else:
+            pie_labels = ['Chưa có dữ liệu']
+            pie_sizes = [100]
+            explode = (0,)
+            
+        pie_colors = (['#3498db', '#2ecc71', '#e67e22', '#9b59b6', '#f1c40f', '#e74c3c'] * 5)[:len(pie_sizes)]
 
         wedges, texts, autotexts = self.ax2.pie(pie_sizes, explode=explode, labels=pie_labels, colors=pie_colors, autopct='%1.1f%%', shadow=False, startangle=140, textprops={'color': "#2c3e50", 'fontsize': 10}, wedgeprops={'edgecolor': 'white', 'linewidth': 1.5, 'antialiased': True})
         for autotext in autotexts: autotext.set_color('white'); autotext.set_weight('bold')

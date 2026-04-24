@@ -156,3 +156,75 @@ class DBManager:
         rows = cursor.fetchall()
         conn.close()
         return rows
+
+    # --- Thống kê nâng cao (Dashboard & Report) ---
+    def get_monthly_revenue(self, year=None):
+        conn = self.connect()
+        cursor = conn.execute("SELECT booking_date, total_price FROM Bookings WHERE status='Đã xác nhận'")
+        rows = cursor.fetchall()
+        conn.close()
+        
+        from collections import defaultdict
+        from datetime import datetime
+        
+        revenue_by_month = defaultdict(int)
+        for date_str, price in rows:
+            try:
+                dt = datetime.strptime(date_str, "%d/%m/%Y")
+                if year is None or dt.year == year:
+                    revenue_by_month[dt.month] += price
+            except ValueError:
+                continue
+        return revenue_by_month
+
+    def get_tour_booking_ratio(self):
+        conn = self.connect()
+        cursor = conn.execute("SELECT tour_name, COUNT(*) FROM Bookings WHERE status != 'Hủy bỏ' GROUP BY tour_name")
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    def get_report_summary(self, year=None):
+        conn = self.connect()
+        cursor = conn.execute("SELECT booking_date, total_price, tour_name FROM Bookings WHERE status='Đã xác nhận'")
+        rows = cursor.fetchall()
+        conn.close()
+
+        from collections import defaultdict
+        from datetime import datetime
+
+        summary = defaultdict(lambda: {'revenue': 0, 'bookings': 0, 'tours': defaultdict(int)})
+
+        for date_str, price, tour_name in rows:
+            try:
+                dt = datetime.strptime(date_str, "%d/%m/%Y")
+                if year is None or dt.year == year:
+                    m = dt.month
+                    summary[m]['revenue'] += price
+                    summary[m]['bookings'] += 1
+                    summary[m]['tours'][tour_name] += 1
+            except ValueError:
+                continue
+        return summary
+
+    def get_revenue_by_tour_report(self, year=None):
+        conn = self.connect()
+        cursor = conn.execute("SELECT booking_date, tour_name, total_price, guest_count FROM Bookings WHERE status='Đã xác nhận'")
+        rows = cursor.fetchall()
+        conn.close()
+
+        from collections import defaultdict
+        from datetime import datetime
+
+        summary = defaultdict(lambda: {'revenue': 0, 'bookings': 0, 'guests': 0})
+
+        for date_str, tour_name, price, guests in rows:
+            try:
+                dt = datetime.strptime(date_str, "%d/%m/%Y")
+                if year is None or dt.year == year:
+                    summary[tour_name]['revenue'] += price
+                    summary[tour_name]['bookings'] += 1
+                    summary[tour_name]['guests'] += guests
+            except ValueError:
+                continue
+        return summary
