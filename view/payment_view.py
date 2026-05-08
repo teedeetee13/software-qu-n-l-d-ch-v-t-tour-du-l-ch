@@ -43,7 +43,7 @@ class PaymentView(ctk.CTkFrame):
         table_bg.grid_rowconfigure(0, weight=1)
         table_bg.grid_columnconfigure(0, weight=1)
 
-        columns = ("ID Thanh Toán", "Mã Đặt Chỗ", "Số Tiền (VNĐ)", "Phương Thức", "Ngày Thanh Toán", "Trạng Thái")
+        columns = ("ID Thanh Toán", "Mã Đặt Chỗ", "Số Tiền (VNĐ)", "Phương Thức", "Ngày Thanh Toán", "Mã GD Ngân Hàng", "Trạng Thái")
         self.tree = ttk.Treeview(table_bg, columns=columns, show="headings", height=15)
         for col in columns:
             self.tree.heading(col, text=col)
@@ -99,35 +99,43 @@ class PaymentView(ctk.CTkFrame):
         entries = {}
         fields = [("ID", "Mã Giao dịch:"), ("Booking", "Mã Đặt chỗ (VD: BK001):"), 
                   ("Amount", "Số tiền (VNĐ):"), ("Method", "Phương thức (Tiền mặt/Chuyển khoản):"), 
-                  ("Date", "Ngày thanh toán (YYYY-MM-DD):"), ("Status", "Trạng thái (Thành công/Chờ xử lý):")]
+                  ("Date", "Ngày thanh toán (YYYY-MM-DD):"), ("TransID", "Mã giao dịch ngân hàng:")]
 
         for key, label in fields:
             ctk.CTkLabel(top, text=label).pack(pady=(5,0), padx=20, anchor="w")
             ent = ctk.CTkEntry(top, width=380)
             ent.pack(pady=2, padx=20)
             entries[key] = ent
+            
+        ctk.CTkLabel(top, text="Trạng thái:").pack(pady=(5,0), padx=20, anchor="w")
+        cb_status = ctk.CTkComboBox(top, values=["Thành công", "Chờ xử lý", "Thất bại", "Hoàn tiền"], width=380)
+        cb_status.pack(pady=2, padx=20)
 
         if data:
             entries["ID"].insert(0, data[0]); entries["ID"].configure(state="disabled")
             entries["Booking"].insert(0, data[1]); entries["Amount"].insert(0, str(data[2]).replace(",",""))
             entries["Method"].insert(0, data[3]); entries["Date"].insert(0, data[4])
-            entries["Status"].insert(0, data[5])
+            entries["TransID"].insert(0, data[5] if data[5] else "")
+            cb_status.set(data[6] if len(data) > 6 else "Thành công")
         else:
             # Tự động điền ID và ngày hôm nay khi THÊM MỚI
             import datetime
             entries["ID"].insert(0, self.db.next_id("Payments", "id", "PAY"))
             entries["ID"].configure(state="disabled")
             entries["Date"].insert(0, datetime.date.today().strftime("%Y-%m-%d"))
+            cb_status.set("Thành công")
 
         def save():
             vals = [e.get() for e in entries.values()]
-            if not all(vals):
+            status = cb_status.get()
+            # Không bắt buộc nhập TransID (vals[5])
+            if not vals[0] or not vals[1] or not vals[2] or not vals[3] or not vals[4] or not status:
                 messagebox.showwarning("Lỗi", "Nhập đủ thông tin!"); return
 
             if data:
-                self.db.update_payment(vals[0], vals[1], int(vals[2]), vals[3], vals[4], vals[5])
+                self.db.update_payment(vals[0], vals[1], int(vals[2]), vals[3], vals[4], vals[5], status)
             else:
-                success, msg = self.db.add_payment(vals[0], vals[1], int(vals[2]), vals[3], vals[4], vals[5])
+                success, msg = self.db.add_payment(vals[0], vals[1], int(vals[2]), vals[3], vals[4], vals[5], status)
                 if not success:
                     messagebox.showerror("Lỗi", msg); return
             

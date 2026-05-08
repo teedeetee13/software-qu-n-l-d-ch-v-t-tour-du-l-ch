@@ -19,7 +19,17 @@ def init_db():
             email TEXT UNIQUE,
             phone TEXT,
             address TEXT,
-            role TEXT NOT NULL CHECK(role IN ('Admin', 'Staff', 'Customer'))
+            role TEXT NOT NULL CHECK(role IN ('Admin', 'Staff'))
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Customers (
+            id TEXT PRIMARY KEY,
+            full_name TEXT NOT NULL,
+            email TEXT UNIQUE,
+            phone TEXT,
+            address TEXT
         )
     ''')
 
@@ -87,7 +97,7 @@ def init_db():
             guest_count INTEGER NOT NULL,
             total_price INTEGER NOT NULL,
             status TEXT,
-            FOREIGN KEY (customer_id) REFERENCES Users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (customer_id) REFERENCES Customers(id) ON DELETE CASCADE ON UPDATE CASCADE,
             FOREIGN KEY (schedule_id) REFERENCES Schedules(id) ON DELETE CASCADE ON UPDATE CASCADE
         )
     ''')
@@ -135,16 +145,18 @@ def init_db():
             ('U001', 'admin', '123456', 'Trần Đức Trường', 'admin@tour.com', '0987654321', 'Hanoi', 'Admin'),
             ('U002', 'staff', '123456', 'Nguyễn Việt Thành', 'staff@tour.com', '0987123456', 'Hanoi', 'Staff'),
         ]
+        cursor.executemany("INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", sample_users)
+        print(f"Đã tạo {len(sample_users)} Users (Admin/Staff).")
+
+        sample_customers = []
         for i in range(NUM_CUSTOMERS):
             full_name = fake.name()
-            username  = fake.unique.user_name()
-            sample_users.append(
-                (f'C{i+1:03}', username, '123456', full_name,
-                 fake.unique.email(), fake.phone_number(), fake.address(), 'Customer')
+            sample_customers.append(
+                (f'C{i+1:03}', full_name, fake.unique.email(), fake.phone_number(), fake.address())
             )
-        cursor.executemany("INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", sample_users)
-        customer_ids = [u[0] for u in sample_users if u[7] == 'Customer']
-        print(f"Đã tạo {len(sample_users)} Users.")
+        cursor.executemany("INSERT INTO Customers VALUES (?, ?, ?, ?, ?)", sample_customers)
+        customer_ids = [c[0] for c in sample_customers]
+        print(f"Đã tạo {len(sample_customers)} Customers.")
 
         # 2. Destinations
         destinations = [

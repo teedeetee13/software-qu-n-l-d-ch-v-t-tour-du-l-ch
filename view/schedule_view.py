@@ -57,10 +57,6 @@ class ScheduleView(ctk.CTkFrame):
         
         self.tree.tag_configure('oddrow', background="#ffffff")
         self.tree.tag_configure('evenrow', background="#f8f9fa")
-        self.tree.tag_configure('Còn chỗ',       foreground="#27ae60")
-        self.tree.tag_configure('Sắp khởi hành', foreground="#e67e22")
-        self.tree.tag_configure('Hết chỗ',        foreground="#e74c3c")
-        self.tree.tag_configure('Đã kết thúc',    foreground="#95a5a6")
 
     def load_data(self):
         for row in self.tree.get_children(): self.tree.delete(row)
@@ -72,9 +68,8 @@ class ScheduleView(ctk.CTkFrame):
             # Hiển thị: (s.id, t.name, s.departure_date, s.return_date, adult_price, s.max_slots, s.booked_slots, s.status)
             price_display = f"{row[5]:,.0f}" if row[5] is not None else "Chưa set"
             display_row = (row[0], row[2], row[3], row[4], price_display, row[6], row[7], row[8])
-            row_tag    = 'evenrow' if i % 2 == 0 else 'oddrow'
-            status_tag = row[8]
-            self.tree.insert("", "end", values=display_row, iid=row[0], tags=(row_tag, status_tag))
+            tag = 'evenrow' if i % 2 == 0 else 'oddrow'
+            self.tree.insert("", "end", values=display_row, iid=row[0]) # Dùng iid để lưu id gốc
 
     def add_schedule(self):
         self.open_form()
@@ -110,11 +105,11 @@ class ScheduleView(ctk.CTkFrame):
 
         top = ctk.CTkToplevel(self)
         top.title("Thông tin Lịch Khởi Hành")
-        top.geometry("420x700")
+        top.geometry("420x750")
         top.grab_set()
 
         entries = {}
-        fields = [("ID", "Mã Lịch trình:"), 
+        fields = [("ID", "Mã Lịch trình (VD: SCH005):"), 
                   ("DepDate", "Ngày khởi hành (YYYY-MM-DD):"), ("RetDate", "Ngày về (YYYY-MM-DD):"),
                   ("Max", "Số chỗ tối đa:"), ("Booked", "Số chỗ đã đặt:")]
 
@@ -151,33 +146,41 @@ class ScheduleView(ctk.CTkFrame):
         if data:
             # data = (s.id, s.tour_id, t.name, s.departure_date, s.return_date, s.price, s.max_slots, s.booked_slots, s.status)
             entries["ID"].insert(0, data[0]); entries["ID"].configure(state="disabled")
-            cb_tour.set(f"{data[2]} (ID: {data[1]})")
+            
+            selected_tour_text = f"{data[2]} (ID: {data[1]})"
+            cb_tour.set(selected_tour_text)
+
             entries["DepDate"].insert(0, data[3])
             entries["RetDate"].insert(0, data[4] if data[4] else "")
             entries["Max"].insert(0, str(data[6]))
             entries["Booked"].insert(0, str(data[7]))
+            
             if prices:
                 price_entries["Người lớn"].insert(0, prices.get("Người lớn", ""))
                 price_entries["Trẻ em"].insert(0, prices.get("Trẻ em", ""))
                 price_entries["Em bé"].insert(0, prices.get("Em bé", ""))
         else:
-            # Tự động điền ID, ngày hôm nay, số chỗ đã đặt = 0
             import datetime
             entries["ID"].insert(0, self.db.next_id("Schedules", "id", "SCH"))
             entries["ID"].configure(state="disabled")
             entries["Booked"].insert(0, "0")
             entries["DepDate"].insert(0, datetime.date.today().strftime("%Y-%m-%d"))
-
-        # Trạng thái tự động tính từ ngày + số chỗ — không cần chọn tay
+        
+        ctk.CTkLabel(top, text="Trạng thái:").pack(pady=(5,0), padx=20, anchor="w")
+        cb_status = ctk.CTkComboBox(top, values=["Còn chỗ", "Hết chỗ", "Sắp khởi hành", "Đã hủy"], width=380)
+        cb_status.pack(pady=2, padx=20)
+        cb_status.set(data[8] if data else "Còn chỗ")
 
         def save():
-            s_id         = entries["ID"].get()
-            dep_date     = entries["DepDate"].get()
-            ret_date     = entries["RetDate"].get()
-            max_slots    = entries["Max"].get()
+            s_id = entries["ID"].get()
+            dep_date = entries["DepDate"].get()
+            ret_date = entries["RetDate"].get()
+            max_slots = entries["Max"].get()
             booked_slots = entries["Booked"].get()
-            tour_id      = tour_map.get(cb_tour.get())
-            if not all([s_id, dep_date, max_slots, booked_slots]) or not tour_id:
+            status = cb_status.get()
+
+            tour_id = tour_map.get(cb_tour.get())
+            if not all([s_id, dep_date, max_slots, booked_slots, status]) or not tour_id:
                 messagebox.showwarning("Lỗi", "Nhập đủ thông tin!"); return
             try:
                 prices_dict = {}
@@ -189,14 +192,14 @@ class ScheduleView(ctk.CTkFrame):
                     messagebox.showwarning("Bắt buộc", "Giá Người lớn không được để trống!"); return
             except ValueError:
                 messagebox.showerror("Lỗi", "Giá và Số chỗ phải là số nguyên!"); return
-
+            
             if data:
-                self.db.update_schedule(s_id, tour_id, dep_date, ret_date, int(max_slots), int(booked_slots), prices_dict)
+                self.db.update_schedule(s_id, tour_id, dep_date, ret_date, int(max_slots), int(booked_slots), status, prices_dict)
             else:
-                success, msg = self.db.add_schedule(s_id, tour_id, dep_date, ret_date, int(max_slots), int(booked_slots), prices_dict)
+                success, msg = self.db.add_schedule(s_id, tour_id, dep_date, ret_date, int(max_slots), int(booked_slots), status, prices_dict)
                 if not success:
                     messagebox.showerror("Lỗi", msg); return
-
+            
             top.destroy()
             self.load_data()
 

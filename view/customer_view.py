@@ -64,7 +64,7 @@ class CustomerView(ctk.CTkFrame):
         for row in self.tree.get_children(): self.tree.delete(row)
         search_kw = self.entry_search.get()
         
-        rows = self.db.get_all_users(role='Customer', search_text=search_kw)
+        rows = self.db.get_all_customers(search_text=search_kw)
         for i, row in enumerate(rows):
             tag = 'evenrow' if i % 2 == 0 else 'oddrow'
             self.tree.insert("", "end", values=row, tags=(tag,))
@@ -88,7 +88,7 @@ class CustomerView(ctk.CTkFrame):
         if not selected: return
         c_id = self.tree.item(selected[0])['values'][0]
         if messagebox.askyesno("Xác nhận", "Xóa Khách hàng này?"):
-            self.db.delete_user(c_id)
+            self.db.delete_customer(c_id)
             self.load_data()
 
     def export_csv(self):
@@ -117,51 +117,41 @@ class CustomerView(ctk.CTkFrame):
         top.grab_set()
 
         entries = {}
-        fields = [("ID", "Mã KH:"), ("Username", "Tên đăng nhập:"), ("Password", "Mật khẩu:"),
-                  ("Name", "Họ Tên:"), ("Email", "Email:"), 
+        fields = [("ID", "Mã KH:"), ("Name", "Họ Tên:"), ("Email", "Email:"), 
                   ("Phone", "Số điện thoại:"), ("Address", "Địa chỉ:")]
 
         for key, label in fields:
             ctk.CTkLabel(top, text=label).pack(pady=(5,0), padx=20, anchor="w")
             ent = ctk.CTkEntry(top, width=360)
-            if key == "Password":
-                ent.configure(show="*")
             ent.pack(pady=2, padx=20)
             entries[key] = ent
 
         if data:
             entries["ID"].insert(0, data[0]); entries["ID"].configure(state="disabled")
-            # Khi sửa, không cho sửa username và không cần hiển thị password
-            entries["Username"].configure(state="disabled")
-            entries["Password"].pack_forget() # Ẩn field mật khẩu
-            top.winfo_children()[-2].pack_forget() # Ẩn label mật khẩu
-            
             entries["Name"].insert(0, data[1])
             entries["Email"].insert(0, data[2])
             entries["Phone"].insert(0, data[3])
             entries["Address"].insert(0, data[4])
         else:
             # Tự động điền ID khi THÊM MỚI
-            entries["ID"].insert(0, self.db.next_id("Users", "id", "C"))
+            entries["ID"].insert(0, self.db.next_id("Customers", "id", "C"))
             entries["ID"].configure(state="disabled")
 
         def save():
             # Lấy giá trị từ các entry
             user_id = entries["ID"].get()
-            username = entries["Username"].get()
-            password = entries["Password"].get()
             full_name = entries["Name"].get()
             email = entries["Email"].get()
             phone = entries["Phone"].get()
             address = entries["Address"].get()
 
-            if not (user_id and username and full_name and email and phone and address and (password or data)):
+            if not (user_id and full_name and email and phone and address):
                 messagebox.showwarning("Lỗi", "Nhập đủ thông tin!"); return
 
             if data:
-                self.db.update_user(user_id, full_name, email, phone, address)
+                self.db.update_customer(user_id, full_name, email, phone, address)
             else:
-                success, msg = self.db.add_user(user_id, username, password, full_name, email, phone, address, 'Customer')
+                success, msg = self.db.add_customer(user_id, full_name, email, phone, address)
                 if not success:
                     messagebox.showerror("Lỗi", msg); return
             

@@ -9,6 +9,23 @@ class DBManager:
         conn.execute("PRAGMA foreign_keys = ON")
         return conn
 
+    def next_id(self, table_name, id_column, prefix):
+        conn = self.connect()
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT {id_column} FROM {table_name} WHERE {id_column} LIKE ?", (f"{prefix}%",))
+        rows = cursor.fetchall()
+        conn.close()
+        
+        max_num = 0
+        for row in rows:
+            try:
+                num_part = int(row[0].replace(prefix, ""))
+                if num_part > max_num:
+                    max_num = num_part
+            except ValueError:
+                pass
+        return f"{prefix}{max_num + 1:03d}"
+
     # --- Xác thực ---
     def check_login(self, username, password):
         conn = self.connect()
@@ -78,43 +95,41 @@ class DBManager:
         conn.close()
         return rows
 
-    # --- Quản lý Người dùng (Khách hàng) ---
-    def get_all_users(self, role, search_text=""):
+    # --- Quản lý Khách hàng (Customers) ---
+    def get_all_customers(self, search_text=""):
         conn = self.connect()
-        query = "SELECT id, full_name, email, phone, address FROM Users WHERE role=? AND (full_name LIKE ? OR phone LIKE ? OR email LIKE ?)"
-        params = [role, f"%{search_text}%", f"%{search_text}%", f"%{search_text}%"]
+        query = "SELECT id, full_name, email, phone, address FROM Customers WHERE (full_name LIKE ? OR phone LIKE ? OR email LIKE ?)"
+        params = [f"%{search_text}%", f"%{search_text}%", f"%{search_text}%"]
         cursor = conn.cursor()
         cursor.execute(query, params)
         rows = cursor.fetchall()
         conn.close()
         return rows
 
-    def add_user(self, u_id, username, password, full_name, email, phone, address, role='Customer'):
+    def add_customer(self, c_id, full_name, email, phone, address):
         conn = self.connect()
         try:
-            conn.execute("INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
-                         (u_id, username, password, full_name, email, phone, address, role))
+            conn.execute("INSERT INTO Customers VALUES (?, ?, ?, ?, ?)", 
+                         (c_id, full_name, email, phone, address))
             conn.commit()
             return True, "Thêm thành công!"
         except sqlite3.IntegrityError as e:
-            if 'UNIQUE constraint failed: Users.username' in str(e):
-                return False, "Tên đăng nhập đã tồn tại!"
-            if 'UNIQUE constraint failed: Users.email' in str(e):
+            if 'UNIQUE constraint failed: Customers.email' in str(e):
                 return False, "Email đã tồn tại!"
-            return False, "Mã người dùng đã tồn tại!"
+            return False, "Mã khách hàng đã tồn tại!"
         finally:
             conn.close()
 
-    def update_user(self, u_id, full_name, email, phone, address):
+    def update_customer(self, c_id, full_name, email, phone, address):
         conn = self.connect()
-        conn.execute("UPDATE Users SET full_name=?, email=?, phone=?, address=? WHERE id=?", 
-                     (full_name, email, phone, address, u_id))
+        conn.execute("UPDATE Customers SET full_name=?, email=?, phone=?, address=? WHERE id=?", 
+                     (full_name, email, phone, address, c_id))
         conn.commit()
         conn.close()
 
-    def delete_user(self, u_id):
+    def delete_customer(self, c_id):
         conn = self.connect()
-        conn.execute("DELETE FROM Users WHERE id=?", (u_id,))
+        conn.execute("DELETE FROM Customers WHERE id=?", (c_id,))
         conn.commit()
         conn.close()
 
@@ -122,12 +137,12 @@ class DBManager:
     def get_all_bookings(self, search_text="", status_filter="Tất cả"):
         conn = self.connect()
         query = """
-            SELECT b.id, u.full_name, t.name, b.booking_date, b.guest_count, b.total_price, b.status, b.customer_id, b.schedule_id 
+            SELECT b.id, c.full_name, t.name, b.booking_date, b.guest_count, b.total_price, b.status, b.customer_id, b.schedule_id 
             FROM Bookings b
-            JOIN Users u ON b.customer_id = u.id
+            JOIN Customers c ON b.customer_id = c.id
             JOIN Schedules s ON b.schedule_id = s.id
             JOIN Tours t ON s.tour_id = t.id
-            WHERE (u.full_name LIKE ? OR t.name LIKE ? OR b.id LIKE ?)
+            WHERE (c.full_name LIKE ? OR t.name LIKE ? OR b.id LIKE ?)
         """
         params = [f"%{search_text}%", f"%{search_text}%", f"%{search_text}%"]
         
@@ -299,7 +314,7 @@ class DBManager:
         cursor.execute("SELECT COUNT(*) FROM Bookings")
         bookings = cursor.fetchone()[0] # This is fine
         
-        cursor.execute("SELECT COUNT(*) FROM Users WHERE role='Customer'")
+        cursor.execute("SELECT COUNT(*) FROM Customers")
         customers = cursor.fetchone()[0]
         
         cursor.execute("SELECT COUNT(*) FROM Schedules WHERE status = 'Còn chỗ'")
@@ -437,7 +452,7 @@ class DBManager:
     def get_all_customers_for_form(self):
         conn = self.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, full_name FROM Users WHERE role='Customer' ORDER BY full_name")
+        cursor.execute("SELECT id, full_name FROM Customers ORDER BY full_name")
         rows = cursor.fetchall()
         conn.close()
         return rows
