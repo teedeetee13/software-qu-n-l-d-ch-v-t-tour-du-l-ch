@@ -7,6 +7,8 @@ from view.login_view import LoginView
 from view.tour_view import TourView
 from view.customer_view import CustomerView
 from view.booking_view import BookingView
+from view.schedule_view import ScheduleView
+from view.payment_view import PaymentView
 from view.dashboard_view import DashboardView
 from view.report_view import ReportView
 
@@ -48,7 +50,9 @@ class MainApp(ctk.CTk):
         # Nút chuyển trang
         self.btn_dashboard = self.create_sidebar_btn("Dashboard", DashboardView)
         self.btn_tour = self.create_sidebar_btn("Quản lý Tour", TourView)
+        self.btn_schedule = self.create_sidebar_btn("Lịch Khởi Hành", ScheduleView)
         self.btn_booking = self.create_sidebar_btn("Quản lý Đặt chỗ", BookingView)
+        self.btn_payment = self.create_sidebar_btn("Thanh Toán", PaymentView)
         self.btn_customer = self.create_sidebar_btn("Khách hàng", CustomerView)
         self.btn_report = self.create_sidebar_btn("Báo cáo", ReportView)
 
@@ -99,7 +103,7 @@ class MainApp(ctk.CTk):
         if self.current_content:
             self.current_content.destroy()
         
-        for btn in [self.btn_dashboard, self.btn_tour, self.btn_customer, self.btn_booking, self.btn_report]:
+        for btn in [self.btn_dashboard, self.btn_tour, self.btn_schedule, self.btn_customer, self.btn_booking, self.btn_payment, self.btn_report]:
             btn.configure(fg_color="transparent", text_color="#bdc3c7", font=ctk.CTkFont(family="Arial", size=16, weight="normal"))
         active_btn.configure(fg_color="#3498db", text_color="#ffffff", font=ctk.CTkFont(family="Arial", size=16, weight="bold"))
 

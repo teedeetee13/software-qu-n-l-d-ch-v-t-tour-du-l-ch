@@ -23,7 +23,8 @@ class TourView(ctk.CTkFrame):
         lbl = ctk.CTkLabel(header_frame, text="Quản lý Tour", font=ctk.CTkFont(family="Arial", size=28, weight="bold"), text_color="#2c3e50")
         lbl.pack(side="left")
 
-        ctk.CTkButton(header_frame, text="+ Thêm Tour Mới", font=ctk.CTkFont(family="Arial", size=14, weight="bold"), fg_color="#3498db", hover_color="#2980b9", height=40, width=160, corner_radius=5, command=self.add_tour).pack(side="right")
+        if auth_session.current_role == "Admin":
+            ctk.CTkButton(header_frame, text="+ Thêm Tour Mới", font=ctk.CTkFont(family="Arial", size=14, weight="bold"), fg_color="#3498db", hover_color="#2980b9", height=40, width=160, corner_radius=5, command=self.add_tour).pack(side="right")
 
     def create_toolbar(self):
         toolbar = ctk.CTkFrame(self, fg_color="#ffffff", corner_radius=8, border_width=1, border_color="#e0e0e0", height=60)
@@ -33,14 +34,13 @@ class TourView(ctk.CTkFrame):
         self.entry_search = ctk.CTkEntry(toolbar, placeholder_text="Tìm kiếm tour, điểm đến...", width=300, height=30, corner_radius=5, fg_color="#f0f2f5", border_color="#e0e0e0", text_color="#2c3e50")
         self.entry_search.pack(side="left", padx=(20, 10), pady=15)
         
-        self.combo_filter = ctk.CTkComboBox(toolbar, values=["Tất cả", "Hoạt động", "Tạm dừng"], width=150, height=30, corner_radius=5, fg_color="#f0f2f5", border_color="#e0e0e0", button_color="#bdc3c7", text_color="#2c3e50", command=lambda _: self.load_data())
-        self.combo_filter.pack(side="left", padx=10, pady=15)
-        
-        ctk.CTkButton(toolbar, text="Lọc", width=80, height=30, corner_radius=5, fg_color="#2ecc71", hover_color="#27ae60", font=ctk.CTkFont(family="Arial", size=14), command=self.load_data).pack(side="left", padx=10, pady=15)
+        ctk.CTkButton(toolbar, text="Tìm kiếm", width=80, height=30, corner_radius=5, fg_color="#2ecc71", hover_color="#27ae60", font=ctk.CTkFont(family="Arial", size=14), command=self.load_data).pack(side="left", padx=10, pady=15)
 
-        ctk.CTkButton(toolbar, text="Xóa", fg_color="#e74c3c", hover_color="#c0392b", width=80, height=30, corner_radius=5, command=self.delete_tour).pack(side="right", padx=(5, 20), pady=15)
-        ctk.CTkButton(toolbar, text="Sửa", fg_color="#f39c12", hover_color="#d35400", width=80, height=30, corner_radius=5, command=self.edit_tour).pack(side="right", padx=5, pady=15)
-        ctk.CTkButton(toolbar, text="Xuất CSV", fg_color="#9b59b6", hover_color="#8e44ad", width=100, height=30, corner_radius=5, command=self.export_csv).pack(side="right", padx=5, pady=15)
+        if auth_session.current_role == "Admin":
+            ctk.CTkButton(toolbar, text="Xóa", fg_color="#e74c3c", hover_color="#c0392b", width=80, height=30, corner_radius=5, command=self.delete_tour).pack(side="right", padx=(5, 20), pady=15)
+            ctk.CTkButton(toolbar, text="Sửa", fg_color="#f39c12", hover_color="#d35400", width=80, height=30, corner_radius=5, command=self.edit_tour).pack(side="right", padx=5, pady=15)
+        
+        ctk.CTkButton(toolbar, text="Xuất CSV", fg_color="#9b59b6", hover_color="#8e44ad", width=100, height=30, corner_radius=5, command=self.export_csv).pack(side="right", padx=(5, 20) if auth_session.current_role != "Admin" else 5, pady=15)
 
     def create_table(self):
         table_bg = ctk.CTkFrame(self, fg_color="#ffffff", corner_radius=8, border_width=1, border_color="#e0e0e0")
@@ -48,12 +48,14 @@ class TourView(ctk.CTkFrame):
         table_bg.grid_rowconfigure(0, weight=1)
         table_bg.grid_columnconfigure(0, weight=1)
 
-        columns = ("ID", "Tên Tour", "Điểm đến", "Thời gian", "Giá (VNĐ)", "Trạng thái")
+        columns = ("ID", "Tên Tour", "Điểm đến", "Loại Tour", "Thời gian", "Mô tả")
         self.tree = ttk.Treeview(table_bg, columns=columns, show="headings", height=15)
         for col in columns:
             self.tree.heading(col, text=col)
             self.tree.column(col, anchor="center")
         self.tree.column("Tên Tour", width=250, anchor="w")
+        self.tree.column("Điểm đến", width=150, anchor="w")
+        self.tree.column("Mô tả", width=350, anchor="w")
         self.tree.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
         
         self.tree.tag_configure('oddrow', background="#ffffff")
@@ -62,14 +64,13 @@ class TourView(ctk.CTkFrame):
     def load_data(self):
         for row in self.tree.get_children(): self.tree.delete(row)
         search_kw = self.entry_search.get()
-        status_flt = self.combo_filter.get()
         
-        rows = self.db.get_all_tours(search_kw, status_flt)
+        rows = self.db.get_all_tours(search_kw)
         for i, row in enumerate(rows):
-            formatted_row = list(row)
-            formatted_row[4] = f"{row[4]:,.0f}"
+            # row = (t.id, t.name, d.name, c.name, t.duration, t.description, ...)
+            display_row = row[:6]
             tag = 'evenrow' if i % 2 == 0 else 'oddrow'
-            self.tree.insert("", "end", values=formatted_row, tags=(tag,))
+            self.tree.insert("", "end", values=display_row, tags=(tag,))
 
     # --- Logic Form ---
     def add_tour(self):
@@ -116,41 +117,65 @@ class TourView(ctk.CTkFrame):
 
         top = ctk.CTkToplevel(self)
         top.title("Thông tin Tour")
-        top.geometry("400x550")
+        top.geometry("450x600")
         top.grab_set()
 
         entries = {}
-        fields = [("ID", "Mã Tour (VD: T005):"), ("Name", "Tên Tour:"), ("Dest", "Điểm đến:"), 
-                  ("Dur", "Thời gian (VD: 3N2Đ):"), ("Price", "Giá tiền (VNĐ):")]
+        fields = [("ID", "Mã Tour:"), ("Name", "Tên Tour:"),
+                  ("Dur", "Thời gian (VD: 3N2Đ):")]
+
+        # --- Combobox for Destination ---
+        ctk.CTkLabel(top, text="Điểm đến:").pack(pady=(10,0), padx=20, anchor="w")
+        dest_data = self.db.get_all_destinations()
+        dest_map = {d[1]: d[0] for d in dest_data} # name: id
+        cb_dest = ctk.CTkComboBox(top, values=list(dest_map.keys()), width=360)
+        cb_dest.pack(pady=2, padx=20)
+
+        # --- Combobox for Category ---
+        ctk.CTkLabel(top, text="Loại Tour:").pack(pady=(10,0), padx=20, anchor="w")
+        cat_data = self.db.get_all_categories()
+        cat_map = {c[1]: c[0] for c in cat_data} # name: id
+        cb_cat = ctk.CTkComboBox(top, values=list(cat_map.keys()), width=360)
+        cb_cat.pack(pady=2, padx=20)
 
         for key, label in fields:
-            ctk.CTkLabel(top, text=label).pack(pady=(10,0), padx=20, anchor="w")
+            ctk.CTkLabel(top, text=label).pack(pady=(5,0), padx=20, anchor="w")
             ent = ctk.CTkEntry(top, width=360)
-            ent.pack(pady=5, padx=20)
+            ent.pack(pady=2, padx=20)
             entries[key] = ent
-
-        ctk.CTkLabel(top, text="Trạng thái:").pack(pady=(10,0), padx=20, anchor="w")
-        cb_status = ctk.CTkComboBox(top, values=["Hoạt động", "Tạm dừng"], width=360)
-        cb_status.pack(pady=5, padx=20)
+        
+        ctk.CTkLabel(top, text="Mô tả:").pack(pady=(5,0), padx=20, anchor="w")
+        txt_desc = ctk.CTkTextbox(top, width=360, height=100)
+        txt_desc.pack(pady=2, padx=20)
 
         if data:
+            # data from treeview: (ID, Tên Tour, Điểm đến, Loại Tour, Thời gian, Mô tả)
             entries["ID"].insert(0, data[0]); entries["ID"].configure(state="disabled")
-            entries["Name"].insert(0, data[1]); entries["Dest"].insert(0, data[2])
-            entries["Dur"].insert(0, data[3]); entries["Price"].insert(0, str(data[4]).replace(",",""))
-            cb_status.set(data[5])
+            entries["Name"].insert(0, data[1])
+            cb_dest.set(data[2] or "")
+            cb_cat.set(data[3] or "")
+            entries["Dur"].insert(0, data[4])
+            txt_desc.insert("1.0", data[5])
+        else:
+            # Tự động điền ID khi THÊM MỚI
+            entries["ID"].insert(0, self.db.next_id("Tours", "id", "T"))
+            entries["ID"].configure(state="disabled")
 
         def save():
-            vals = [e.get() for e in entries.values()]
-            if not all(vals):
-                messagebox.showwarning("Lỗi", "Nhập đủ thông tin!"); return
-            try: int(vals[4])
-            except ValueError:
-                messagebox.showerror("Lỗi", "Giá phải là số!"); return
+            t_id = entries["ID"].get()
+            name = entries["Name"].get()
+            duration = entries["Dur"].get()
+            description = txt_desc.get("1.0", "end-1c")
+            dest_id = dest_map.get(cb_dest.get())
+            cat_id = cat_map.get(cb_cat.get())
+
+            if not (t_id and name and duration and description and dest_id is not None and cat_id is not None):
+                messagebox.showwarning("Lỗi", "Nhập đủ thông tin và chọn từ danh sách!"); return
 
             if data:
-                self.db.update_tour(vals[0], vals[1], vals[2], vals[3], int(vals[4]), cb_status.get())
+                self.db.update_tour(t_id, name, dest_id, cat_id, duration, description)
             else:
-                success, msg = self.db.add_tour(vals[0], vals[1], vals[2], vals[3], int(vals[4]), cb_status.get())
+                success, msg = self.db.add_tour(t_id, name, dest_id, cat_id, duration, description)
                 if not success:
                     messagebox.showerror("Lỗi", msg); return
             

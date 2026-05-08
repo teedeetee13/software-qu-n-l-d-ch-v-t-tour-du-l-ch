@@ -21,7 +21,7 @@
     ```
 2.  **Cài đặt các thư viện cần thiết:**
     ```bash
-    pip install customtkinter matplotlib
+    pip install customtkinter matplotlib Faker
     ```
 3.  **Khởi tạo cơ sở dữ liệu:**
     Chạy file `database.py` để tạo file `tour_management.db` cùng các bảng và dữ liệu mẫu.
