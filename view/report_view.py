@@ -173,18 +173,13 @@ class ReportView(ctk.CTkFrame):
     #  Logic điều khiển bộ lọc
     # ------------------------------------------------------------------ #
     def on_type_change(self, report_type):
-        """
-        Doanh thu theo năm   → KHÔNG cần chọn năm/tháng cụ thể (hiện tất cả năm)
-        Doanh thu theo tháng → Chọn NĂM + (tùy chọn) THÁNG cụ thể
-        Doanh thu theo Tour  → Chọn NĂM + (tùy chọn) THÁNG cụ thể
-        """
         if report_type == "Doanh thu theo năm":
-            # Không cần lọc theo năm hay tháng → disable cả hai
-            self.combo_year.configure(state="disabled")
+            # Chọn năm để xem tổng quan 12 tháng; không cần chọn tháng
+            self.combo_year.configure(state="normal")
+            self.combo_month.set("Cả năm")
             self.combo_month.configure(state="disabled")
 
         elif report_type == "Doanh thu theo tháng":
-            # Cần chọn năm; tháng để chọn xem 1 tháng cụ thể hoặc cả năm
             self.combo_year.configure(state="normal")
             self.combo_month.set("Cả năm")
             self.combo_month.configure(state="normal")
@@ -217,8 +212,9 @@ class ReportView(ctk.CTkFrame):
             self.tree.delete(row)
 
         if report_type == "Doanh thu theo năm":
-            data = self.db.get_yearly_revenue_report()
-            self._render_yearly(data)
+            # Hiển thị bar chart 12 tháng của năm được chọn
+            data = self.db.get_report_summary(year_val)
+            self._render_monthly(data, year_val, chart_type="Cột")
 
         elif report_type == "Doanh thu theo tháng":
             if month_val is None:
@@ -264,7 +260,7 @@ class ReportView(ctk.CTkFrame):
     # ------------------------------------------------------------------ #
     #  Render: theo tháng trong một năm
     # ------------------------------------------------------------------ #
-    def _render_monthly(self, data, year):
+    def _render_monthly(self, data, year, chart_type="Đường"):
         months    = [f"T{i}" for i in range(1, 13)]
         revenues  = [data[i]['revenue'] for i in range(1, 13)]
         total_rev = sum(revenues)
@@ -281,9 +277,10 @@ class ReportView(ctk.CTkFrame):
         label = (best_tour[:20] + "...") if len(best_tour) > 20 else best_tour
         self.card_growth.configure(text=label)
 
+        color = "#3498db" if chart_type == "Cột" else "#e67e22"
         self._plot_data(
             months, [r / 1_000_000 for r in revenues],
-            "Đường", f"Doanh thu năm {year} (Triệu VNĐ)", "#e67e22"
+            chart_type, f"Doanh thu năm {year} (Triệu VNĐ)", color
         )
 
         self._setup_tree(("Tháng", "Doanh thu", "Đơn"))
@@ -396,11 +393,14 @@ class ReportView(ctk.CTkFrame):
     #  Tiện ích bảng
     # ------------------------------------------------------------------ #
     def _setup_tree(self, columns):
+        width_map = {
+            "Năm":       90,  "Tháng":     90,  "Ngày":      110,
+            "Doanh thu": 155, "Đơn hàng":  80,  "Đơn":       55,
+            "Khách":     65,  "Tên Tour":  185,
+        }
         self.tree.configure(columns=columns)
         for col in columns:
+            w = width_map.get(col, 80)
+            anchor = "w" if col == "Tên Tour" else ("e" if col == "Doanh thu" else "center")
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=80, anchor="center")
-        if "Tên Tour" in columns:
-            self.tree.column("Tên Tour", width=180, anchor="w")
-        if "Ngày" in columns:
-            self.tree.column("Ngày", width=110, anchor="center")
+            self.tree.column(col, width=w, anchor=anchor)

@@ -1,7 +1,9 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
+import datetime
 from db_manager import DBManager
 import auth_session
+from view.schedule_view import DatePickerWidget
 
 class PaymentView(ctk.CTkFrame):
     def __init__(self, parent):
@@ -98,47 +100,61 @@ class PaymentView(ctk.CTkFrame):
 
         entries = {}
         fields = [("ID", "Mã Giao dịch:"), ("Booking", "Mã Đặt chỗ (VD: BK001):"), 
-                  ("Amount", "Số tiền (VNĐ):"), ("Method", "Phương thức (Tiền mặt/Chuyển khoản):"), 
-                  ("Date", "Ngày thanh toán (YYYY-MM-DD):"), ("TransID", "Mã giao dịch ngân hàng:")]
+                  ("Amount", "Số tiền (VNĐ):"), ("Method", "Phương thức (Tiền mặt/Chuyển khoản):"),
+                  ("TransID", "Mã giao dịch ngân hàng:")]
 
         for key, label in fields:
             ctk.CTkLabel(top, text=label).pack(pady=(5,0), padx=20, anchor="w")
             ent = ctk.CTkEntry(top, width=380)
             ent.pack(pady=2, padx=20)
             entries[key] = ent
-            
+
+        # DatePicker ngày thanh toán
+        ctk.CTkLabel(top, text="Ngày thanh toán:").pack(pady=(5,0), padx=20, anchor="w")
+        dp_date = DatePickerWidget(top, width=380)
+        dp_date.pack(pady=2, padx=20, anchor="w")
+
         ctk.CTkLabel(top, text="Trạng thái:").pack(pady=(5,0), padx=20, anchor="w")
         cb_status = ctk.CTkComboBox(top, values=["Thành công", "Chờ xử lý", "Thất bại", "Hoàn tiền"], width=380)
         cb_status.pack(pady=2, padx=20)
 
         if data:
             entries["ID"].insert(0, data[0]); entries["ID"].configure(state="disabled")
-            entries["Booking"].insert(0, data[1]); entries["Amount"].insert(0, str(data[2]).replace(",",""))
-            entries["Method"].insert(0, data[3]); entries["Date"].insert(0, data[4])
+            entries["Booking"].insert(0, data[1])
+            entries["Amount"].insert(0, str(data[2]).replace(",",""))
+            entries["Method"].insert(0, data[3])
+            dp_date.set(data[4])
             entries["TransID"].insert(0, data[5] if data[5] else "")
             cb_status.set(data[6] if len(data) > 6 else "Thành công")
         else:
-            # Tự động điền ID và ngày hôm nay khi THÊM MỚI
-            import datetime
             entries["ID"].insert(0, self.db.next_id("Payments", "id", "PAY"))
             entries["ID"].configure(state="disabled")
-            entries["Date"].insert(0, datetime.date.today().strftime("%Y-%m-%d"))
             cb_status.set("Thành công")
 
         def save():
-            vals = [e.get() for e in entries.values()]
-            status = cb_status.get()
-            # Không bắt buộc nhập TransID (vals[5])
-            if not vals[0] or not vals[1] or not vals[2] or not vals[3] or not vals[4] or not status:
+            p_id    = entries["ID"].get()
+            b_id    = entries["Booking"].get()
+            amount  = entries["Amount"].get()
+            method  = entries["Method"].get()
+            p_date  = dp_date.get()
+            trans_id = entries["TransID"].get()
+            status  = cb_status.get()
+
+            if not all([p_id, b_id, amount, method, p_date, status]):
                 messagebox.showwarning("Lỗi", "Nhập đủ thông tin!"); return
 
+            try:
+                datetime.date.fromisoformat(p_date)
+            except ValueError:
+                messagebox.showerror("Lỗi", "Ngày thanh toán không hợp lệ!"); return
+
             if data:
-                self.db.update_payment(vals[0], vals[1], int(vals[2]), vals[3], vals[4], vals[5], status)
+                self.db.update_payment(p_id, b_id, int(amount), method, p_date, trans_id, status)
             else:
-                success, msg = self.db.add_payment(vals[0], vals[1], int(vals[2]), vals[3], vals[4], vals[5], status)
+                success, msg = self.db.add_payment(p_id, b_id, int(amount), method, p_date, trans_id, status)
                 if not success:
                     messagebox.showerror("Lỗi", msg); return
-            
+
             top.destroy()
             self.load_data()
 

@@ -185,10 +185,10 @@ class DBManager:
     def get_all_schedules(self, search_text=""):
         conn = self.connect()
         query = """
-            SELECT 
-                s.id, s.tour_id, t.name, s.departure_date, s.return_date, 
-                p.price, -- Lấy giá của người lớn làm giá tham chiếu
-                s.max_slots, s.booked_slots, s.status
+            SELECT
+                s.id, s.tour_id, t.name, s.departure_date, s.return_date,
+                p.price,
+                s.max_slots, s.booked_slots, s.status, s.guide_name
             FROM Schedules s
             JOIN Tours t ON s.tour_id = t.id
             LEFT JOIN Price_Policies p ON s.id = p.schedule_id AND p.passenger_type = 'Người lớn'
@@ -211,8 +211,8 @@ class DBManager:
         return {row[0]: row[1] for row in rows}
 
     @staticmethod
-    def _calc_status(dep_date_str, max_slots, booked_slots):
-        """Tự động tính trạng thái — không để admin chọn tay."""
+    def _calc_status(dep_date_str, booked_slots, max_slots=None):
+        """Tự động tính trạng thái dựa vào ngày và số chỗ."""
         from datetime import date, timedelta
         try:
             dep = date.fromisoformat(str(dep_date_str))
@@ -221,44 +221,60 @@ class DBManager:
         today = date.today()
         if dep < today:
             return "Đã kết thúc"
-        if int(booked_slots) >= int(max_slots):
+        if max_slots is not None and int(booked_slots) >= int(max_slots):
             return "Hết chỗ"
         if dep <= today + timedelta(days=3):
             return "Sắp khởi hành"
         return "Còn chỗ"
 
-    def add_schedule(self, s_id, tour_id, dep_date, ret_date, max_slots, booked_slots, prices):
-        status = self._calc_status(dep_date, max_slots, booked_slots)
+    def add_schedule(self, s_id, tour_id, dep_date, ret_date, booked_slots, prices, guide_name=""):
+        """Thêm lịch khởi hành mới. max_slots mặc định 999 (không giới hạn)."""
+        status = self._calc_status(dep_date, booked_slots)
         conn = self.connect()
         try:
             cursor = conn.cursor()
             cursor.execute("BEGIN TRANSACTION")
-            cursor.execute("INSERT INTO Schedules (id, tour_id, departure_date, return_date, max_slots, booked_slots, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                         (s_id, tour_id, dep_date, ret_date, max_slots, booked_slots, status))
+            cursor.execute(
+                "INSERT INTO Schedules (id, tour_id, departure_date, return_date, max_slots, booked_slots, status, guide_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (s_id, tour_id, dep_date, ret_date, 999, booked_slots, status, guide_name)
+            )
             for p_type, price in prices.items():
-                cursor.execute("INSERT INTO Price_Policies (schedule_id, passenger_type, price) VALUES (?, ?, ?)",
-                                 (s_id, p_type, price))
+                cursor.execute(
+                    "INSERT INTO Price_Policies (schedule_id, passenger_type, price) VALUES (?, ?, ?)",
+                    (s_id, p_type, price)
+                )
             conn.commit()
             return True, "Thêm thành công!"
         except Exception as e:
             conn.rollback()
-            return False, "Mã Lịch trình đã tồn tại!"
+            return False, f"Lỗi: {e}"
         finally:
             conn.close()
 
-    def update_schedule(self, s_id, tour_id, dep_date, ret_date, max_slots, booked_slots, prices):
-        status = self._calc_status(dep_date, max_slots, booked_slots)
+    def update_schedule(self, s_id, tour_id, dep_date, ret_date, booked_slots, prices, guide_name=""):
+        """Cập nhật lịch khởi hành. Trạng thái được tính tự động."""
         conn = self.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT max_slots FROM Schedules WHERE id=?", (s_id,))
+        row = cursor.fetchone()
+        max_slots = row[0] if row else 999
+        status = self._calc_status(dep_date, booked_slots, max_slots)
         try:
-            cursor = conn.cursor()
             cursor.execute("BEGIN TRANSACTION")
-            cursor.execute("UPDATE Schedules SET tour_id=?, departure_date=?, return_date=?, max_slots=?, booked_slots=?, status=? WHERE id=?",
-                         (tour_id, dep_date, ret_date, max_slots, booked_slots, status, s_id))
+            cursor.execute(
+                "UPDATE Schedules SET tour_id=?, departure_date=?, return_date=?, booked_slots=?, status=?, guide_name=? WHERE id=?",
+                (tour_id, dep_date, ret_date, booked_slots, status, guide_name, s_id)
+            )
             cursor.execute("DELETE FROM Price_Policies WHERE schedule_id=?", (s_id,))
             for p_type, price in prices.items():
-                cursor.execute("INSERT INTO Price_Policies (schedule_id, passenger_type, price) VALUES (?, ?, ?)",
-                                 (s_id, p_type, price))
+                cursor.execute(
+                    "INSERT INTO Price_Policies (schedule_id, passenger_type, price) VALUES (?, ?, ?)",
+                    (s_id, p_type, price)
+                )
             conn.commit()
+        except Exception as e:
+            conn.rollback()
+            raise e
         finally:
             conn.close()
 
@@ -267,6 +283,135 @@ class DBManager:
         conn.execute("DELETE FROM Schedules WHERE id=?", (s_id,))
         conn.commit()
         conn.close()
+
+    # --- Quản lý User ---
+    def get_all_users(self, search_text=""):
+        conn = self.connect()
+        query = "SELECT id, username, full_name, email, phone, role FROM Users WHERE (username LIKE ? OR full_name LIKE ? OR email LIKE ?)"
+        params = [f"%{search_text}%"] * 3
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    def add_user(self, u_id, username, password, full_name, email, phone, address, role):
+        conn = self.connect()
+        try:
+            conn.execute("INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                         (u_id, username, password, full_name, email, phone, address, role))
+            conn.commit()
+            return True, "Thêm thành công!"
+        except sqlite3.IntegrityError as e:
+            if 'username' in str(e):
+                return False, "Tên đăng nhập đã tồn tại!"
+            if 'email' in str(e):
+                return False, "Email đã tồn tại!"
+            return False, "Mã User đã tồn tại!"
+        finally:
+            conn.close()
+
+    def update_user(self, u_id, username, password, full_name, email, phone, address, role):
+        conn = self.connect()
+        try:
+            conn.execute(
+                "UPDATE Users SET username=?, password=?, full_name=?, email=?, phone=?, address=?, role=? WHERE id=?",
+                (username, password, full_name, email, phone, address, role, u_id))
+            conn.commit()
+            return True, "Cập nhật thành công!"
+        except sqlite3.IntegrityError as e:
+            if 'username' in str(e):
+                return False, "Tên đăng nhập đã tồn tại!"
+            if 'email' in str(e):
+                return False, "Email đã tồn tại!"
+            return False, "Lỗi cập nhật!"
+        finally:
+            conn.close()
+
+    def delete_user(self, u_id):
+        conn = self.connect()
+        conn.execute("DELETE FROM Users WHERE id=?", (u_id,))
+        conn.commit()
+        conn.close()
+
+    # --- Quản lý Hướng dẫn viên ---
+    def get_all_guides(self, search_text=""):
+        conn = self.connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, full_name, phone, email, specialty, experience_years FROM Guides "
+            "WHERE (full_name LIKE ? OR specialty LIKE ? OR phone LIKE ?) ORDER BY full_name",
+            [f"%{search_text}%"] * 3)
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    def get_all_guides_for_form(self):
+        conn = self.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT full_name FROM Guides ORDER BY full_name")
+        rows = cursor.fetchall()
+        conn.close()
+        return [r[0] for r in rows]
+
+    def add_guide(self, g_id, full_name, phone, email, specialty, experience):
+        conn = self.connect()
+        try:
+            conn.execute("INSERT INTO Guides VALUES (?, ?, ?, ?, ?, ?)",
+                         (g_id, full_name, phone, email, specialty, experience))
+            conn.commit()
+            return True, "Thêm thành công!"
+        except sqlite3.IntegrityError as e:
+            if 'email' in str(e):
+                return False, "Email đã tồn tại!"
+            return False, "Mã HDV đã tồn tại!"
+        finally:
+            conn.close()
+
+    def update_guide(self, g_id, full_name, phone, email, specialty, experience):
+        conn = self.connect()
+        try:
+            conn.execute(
+                "UPDATE Guides SET full_name=?, phone=?, email=?, specialty=?, experience_years=? WHERE id=?",
+                (full_name, phone, email, specialty, experience, g_id))
+            conn.commit()
+            return True, "Cập nhật thành công!"
+        except sqlite3.IntegrityError:
+            return False, "Email đã tồn tại!"
+        finally:
+            conn.close()
+
+    def delete_guide(self, g_id):
+        conn = self.connect()
+        conn.execute("DELETE FROM Guides WHERE id=?", (g_id,))
+        conn.commit()
+        conn.close()
+
+    # --- Helpers cho Form Đặt chỗ ---
+    def get_schedules_by_tour_for_form(self, tour_id):
+        conn = self.connect()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT s.id, s.departure_date || ' [' || s.status || ']' as display
+            FROM Schedules s
+            WHERE s.tour_id = ? AND s.status IN ('Còn chỗ', 'Sắp khởi hành')
+            ORDER BY s.departure_date
+        """, (tour_id,))
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
+
+    def search_customers(self, search_text):
+        conn = self.connect()
+        query = """SELECT id, full_name, phone, email FROM Customers
+                   WHERE (full_name LIKE ? OR phone LIKE ? OR email LIKE ?)
+                   ORDER BY full_name LIMIT 50"""
+        params = [f"%{search_text}%"] * 3
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
 
     # --- Quản lý Thanh toán (Payments) ---
     def get_all_payments(self, search_text=""):
@@ -317,7 +462,10 @@ class DBManager:
         cursor.execute("SELECT COUNT(*) FROM Customers")
         customers = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM Schedules WHERE status = 'Còn chỗ'")
+        cursor.execute("""
+            SELECT COUNT(*) FROM Schedules
+            WHERE departure_date >= date('now') AND booked_slots < max_slots
+        """)
         active_schedules = cursor.fetchone()[0]
         
         conn.close()
@@ -469,58 +617,32 @@ class DBManager:
         rows = cursor.fetchall()
         conn.close()
         return rows
-    # ============================================================
-# THÊM METHOD NÀY VÀO CLASS DBManager TRONG db_manager.py
-# Dùng cho ReportView khi chọn "Doanh thu theo tháng" + chọn
-# tháng cụ thể → hiển thị doanh thu theo từng ngày trong tháng
-# ============================================================
 
-def get_daily_revenue_report(self, year: int, month: int) -> dict:
-    """
-    Trả về doanh thu theo từng ngày trong tháng/năm được chỉ định.
-
-    Kết quả:
-        {
-            1:  {'revenue': 0, 'bookings': 0, 'tours': {}},
-            2:  {'revenue': 5000000, 'bookings': 1, 'tours': {'Tour ABC': 1}},
-            ...
-            31: {...}
-        }
-    """
-    import calendar
-
-    num_days = calendar.monthrange(year, month)[1]
-    # Khởi tạo dict cho mỗi ngày trong tháng
-    result = {
-        d: {'revenue': 0, 'bookings': 0, 'tours': {}}
-        for d in range(1, num_days + 1)
-    }
-
-    conn   = self._get_connection()          # hoặc sqlite3.connect(...) tuỳ cách bạn viết DBManager
-    cursor = conn.cursor()
-
-    # Lấy tất cả booking trong tháng đó (dựa vào booking_date)
-    cursor.execute("""
-        SELECT
-            CAST(strftime('%d', b.booking_date) AS INTEGER) AS day,
-            b.total_price,
-            b.guest_count,
-            t.name AS tour_name
-        FROM Bookings b
-        JOIN Schedules s ON b.schedule_id = s.id
-        JOIN Tours t     ON s.tour_id     = t.id
-        WHERE b.status != 'Đã hủy'
-          AND strftime('%Y', b.booking_date) = ?
-          AND strftime('%m', b.booking_date) = ?
-    """, (str(year), f"{month:02d}"))
-
-    for row in cursor.fetchall():
-        day, price, guests, tour_name = row
-        if day not in result:
-            continue
-        result[day]['revenue']  += price
-        result[day]['bookings'] += 1
-        result[day]['tours'][tour_name] = result[day]['tours'].get(tour_name, 0) + guests
-
-    conn.close()
-    return result
+    def get_daily_revenue_report(self, year: int, month: int) -> dict:
+        import calendar
+        num_days = calendar.monthrange(year, month)[1]
+        result = {d: {'revenue': 0, 'bookings': 0, 'tours': {}}
+                  for d in range(1, num_days + 1)}
+        conn = self.connect()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT
+                CAST(strftime('%d', b.booking_date) AS INTEGER) AS day,
+                b.total_price,
+                b.guest_count,
+                t.name AS tour_name
+            FROM Bookings b
+            JOIN Schedules s ON b.schedule_id = s.id
+            JOIN Tours t     ON s.tour_id     = t.id
+            WHERE b.status = 'Đã xác nhận'
+              AND strftime('%Y', b.booking_date) = ?
+              AND strftime('%m', b.booking_date) = ?
+        """, (str(year), f"{month:02d}"))
+        for day, price, guests, tour_name in cursor.fetchall():
+            if day not in result:
+                continue
+            result[day]['revenue']  += price
+            result[day]['bookings'] += 1
+            result[day]['tours'][tour_name] = result[day]['tours'].get(tour_name, 0) + guests
+        conn.close()
+        return result
